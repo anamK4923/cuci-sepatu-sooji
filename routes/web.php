@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\NotificationsController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ServicesController;
 use Illuminate\Support\Facades\Route;
@@ -17,6 +18,7 @@ Route::middleware(['admin'])->group(function () {
 Route::middleware(['member'])->group(function () {
     Route::get('/dashboard-member', [DashboardController::class, 'indexMember'])->name('dashboard.member');
     Route::get('/services-member', [ServicesController::class, 'indexMember'])->name('services.member');
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
 });
 
 Route::get(
