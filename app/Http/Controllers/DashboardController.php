@@ -26,8 +26,8 @@ class DashboardController extends Controller
         return view('dashboard.dashboard-admin', $data);
     }
 
-    public function indexStudent(): View
+    public function indexMember(): View
     {
-        return view('dashboard.dashboard-student');
+        return view('dashboard.dashboard-member');
     }
 }

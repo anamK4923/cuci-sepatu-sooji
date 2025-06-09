@@ -9,8 +9,8 @@
     <title>{{ $title }}</title>
 
     <!-- Favicons -->
-    <link href="icon/favicon.ico" rel="icon">
-    <link href="icon/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="images/web/favicon.ico" rel="icon">
+    <link href="images/web/apple-touch-icon.png" rel="apple-touch-icon">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -21,13 +21,13 @@
 </head>
 
 <body class="font-sans text-gray-900 antialiased">
-    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100 dark:bg-gray-900">
-        <div>
+    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-[#f1f5f9] dark:bg-gray-900">
+        <!-- <div>
             <a href="/">
-                <img src="{{ asset('images/logo.png') }}" class="w-20 h-20 fill-current text-gray-500" alt="Logo">
-                <!-- <x-application-logo class="w-20 h-20 fill-current text-gray-500" /> -->
+                <img src="{{ asset('images/web/icon-512.png') }}" class="w-20 h-20 fill-current text-gray-500" alt="Logo">
+                <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
             </a>
-        </div>
+        </div> -->
 
         <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white dark:bg-gray-800 shadow-md overflow-hidden sm:rounded-lg">
             {{ $slot }}

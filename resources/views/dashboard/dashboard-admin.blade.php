@@ -2,7 +2,7 @@
 
 @section('subtitle', 'Dashboard Admin')
 @section('content_header_title', 'Dashboard')
-@section('content_header_subtitle', 'PPDB - Admin Panel')
+@section('content_header_subtitle', 'Sneat - Admin Panel')
 
 @section('content_body')
 

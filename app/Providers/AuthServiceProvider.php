@@ -24,8 +24,8 @@ class AuthServiceProvider extends ServiceProvider
             return $user->role === 'admin';
         });
 
-        Gate::define('student-only', function ($user) {
-            return $user->role === 'student';
+        Gate::define('member-only', function ($user) {
+            return $user->role === 'member';
         });
     }
 }

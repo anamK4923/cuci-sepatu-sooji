@@ -33,11 +33,8 @@ class RegisteredUserController extends Controller
             'name'          => ['required', 'string', 'max:255'],
             'email'         => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password'      => ['required', 'confirmed', Rules\Password::defaults()],
-            'role'          => ['required', 'in:admin,student'],
-            'nisn'          => ['nullable', 'string', 'max:20'],
+            'role'          => ['required', 'in:admin,member'],
             'no_hp'         => ['nullable', 'string', 'max:20'],
-            'asal_sekolah'  => ['nullable', 'string', 'max:255'],
-            'alamat'        => ['nullable', 'string'],
         ]);
 
         $user = User::create([
@@ -45,10 +42,7 @@ class RegisteredUserController extends Controller
             'email'         => $request->email,
             'password'      => Hash::make($request->password),
             'role'          => $request->role,
-            'nisn'          => $request->nisn,
             'no_hp'         => $request->no_hp,
-            'asal_sekolah'  => $request->asal_sekolah,
-            'alamat'        => $request->alamat,
         ]);
 
         event(new Registered($user));
@@ -59,7 +53,7 @@ class RegisteredUserController extends Controller
         if ($user->role === 'admin') {
             return redirect()->route('dashboard.admin');
         } else {
-            return redirect()->route('dashboard.student');
+            return redirect()->route('dashboard.member');
         }
     }
 }

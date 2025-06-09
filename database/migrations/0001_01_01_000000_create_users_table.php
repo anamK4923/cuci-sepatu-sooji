@@ -18,14 +18,9 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
 
-            // Role: admin atau student
-            $table->enum('role', ['admin', 'student'])->default('student');
-
-            // Data tambahan untuk calon siswa
-            $table->string('nisn')->nullable();       // Nomor Induk Siswa Nasional
-            $table->string('no_hp')->nullable();      // No HP calon siswa
-            $table->string('asal_sekolah')->nullable(); // Asal sekolah
-            $table->string('alamat')->nullable();     // Alamat lengkap
+            // Role: admin atau member
+            $table->enum('role', ['admin', 'member'])->default('member');
+            $table->string('no_hp')->nullable();
 
             $table->boolean('dark_mode')->default(false);
             $table->rememberToken();

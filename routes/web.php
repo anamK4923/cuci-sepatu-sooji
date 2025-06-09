@@ -4,16 +4,19 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ServicesController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 
 Route::middleware(['admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'indexAdmin'])->name('dashboard.admin');
+    Route::get('/services-admin', [ServicesController::class, 'indexAdmin'])->name('services.admin');
 });
 
-Route::middleware(['student'])->group(function () {
-    Route::get('/dashboard-student', [DashboardController::class, 'indexStudent'])->name('dashboard.student');
+Route::middleware(['member'])->group(function () {
+    Route::get('/dashboard-member', [DashboardController::class, 'indexMember'])->name('dashboard.member');
+    Route::get('/services-member', [ServicesController::class, 'indexMember'])->name('services.member');
 });
 
 Route::get(
