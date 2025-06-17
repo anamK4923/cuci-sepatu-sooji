@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Landing Page - Sneat</title>
+    <title>Landing Page - Soooji</title>
     <meta name="description" content="">
     <meta name="keywords" content="">
 
@@ -36,7 +36,8 @@
             <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
                 <!-- Uncomment the line below if you also wish to use an image logo -->
                 <!-- <img src="welcome/assets/img/logo.png" alt=""> -->
-                <h1 class="sitename">Sneat</h1><span>.</span>
+                <h1 class="sitename">Soooji</h1><span>.</span>
+                <h1>Id</h1>
             </a>
 
             <nav id="navmenu" class="navmenu">
@@ -395,91 +396,71 @@
                     <div class="row gy-4 isotope-container" data-aos="fade-up" data-aos-delay="200">
 
                         <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-deepclean">
-                            <img src="welcome/assets/img/masonry-portfolio/masonry-portfolio-1.jpg" class="img-fluid" alt="">
+                            <img src="/images/galeri-1.jpeg" class="img-fluid" alt="">
                             <div class="portfolio-info">
                                 <h4>App 1</h4>
                                 <p>Lorem ipsum, dolor sit</p>
-                                <a href="welcome/assets/img/masonry-portfolio/masonry-portfolio-1.jpg" title="App 1" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
+                                <a href="/images/galeri-1.jpeg" title="App 1" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                                 <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                             </div>
                         </div><!-- End Portfolio Item -->
 
                         <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-repaint">
-                            <img src="welcome/assets/img/masonry-portfolio/masonry-portfolio-2.jpg" class="img-fluid" alt="">
+                            <img src="/images/galeri-2.jpeg" class="img-fluid" alt="">
                             <div class="portfolio-info">
                                 <h4>Product 1</h4>
                                 <p>Lorem ipsum, dolor sit</p>
-                                <a href="welcome/assets/img/masonry-portfolio/masonry-portfolio-2.jpg" title="Product 1" data-gallery="portfolio-gallery-product" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
+                                <a href="/images/galeri-2.jpeg" title="Product 1" data-gallery="portfolio-gallery-product" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                                 <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                             </div>
                         </div><!-- End Portfolio Item -->
 
                         <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-fastclean">
-                            <img src="welcome/assets/img/masonry-portfolio/masonry-portfolio-3.jpg" class="img-fluid" alt="">
+                            <img src="/images/galeri-3.jpeg" class="img-fluid" alt="">
                             <div class="portfolio-info">
                                 <h4>Branding 1</h4>
                                 <p>Lorem ipsum, dolor sit</p>
-                                <a href="welcome/assets/img/masonry-portfolio/masonry-portfolio-3.jpg" title="Branding 1" data-gallery="portfolio-gallery-branding" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
+                                <a href="/images/galeri-3.jpeg" title="Branding 1" data-gallery="portfolio-gallery-branding" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                                 <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                             </div>
                         </div><!-- End Portfolio Item -->
 
                         <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-deepclean">
-                            <img src="welcome/assets/img/masonry-portfolio/masonry-portfolio-4.jpg" class="img-fluid" alt="">
+                            <img src="/images/galeri-4.jpeg" class="img-fluid" alt="">
                             <div class="portfolio-info">
                                 <h4>App 2</h4>
                                 <p>Lorem ipsum, dolor sit</p>
-                                <a href="welcome/assets/img/masonry-portfolio/masonry-portfolio-4.jpg" title="App 2" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
+                                <a href="/images/galeri-4.jpeg" title="App 2" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                                 <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                             </div>
                         </div><!-- End Portfolio Item -->
 
                         <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-repaint">
-                            <img src="welcome/assets/img/masonry-portfolio/masonry-portfolio-5.jpg" class="img-fluid" alt="">
+                            <img src="/images/galeri-5.jpeg" class="img-fluid" alt="">
                             <div class="portfolio-info">
                                 <h4>Product 2</h4>
                                 <p>Lorem ipsum, dolor sit</p>
-                                <a href="welcome/assets/img/masonry-portfolio/masonry-portfolio-5.jpg" title="Product 2" data-gallery="portfolio-gallery-product" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
+                                <a href="/images/galeri-5.jpeg" title="Product 2" data-gallery="portfolio-gallery-product" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                                 <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                             </div>
                         </div><!-- End Portfolio Item -->
 
                         <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-fastclean">
-                            <img src="welcome/assets/img/masonry-portfolio/masonry-portfolio-6.jpg" class="img-fluid" alt="">
+                            <img src="/images/galeri-6.jpeg" class="img-fluid" alt="">
                             <div class="portfolio-info">
                                 <h4>Branding 2</h4>
                                 <p>Lorem ipsum, dolor sit</p>
-                                <a href="welcome/assets/img/masonry-portfolio/masonry-portfolio-6.jpg" title="Branding 2" data-gallery="portfolio-gallery-branding" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
+                                <a href="/images/galeri-6.jpeg" title="Branding 2" data-gallery="portfolio-gallery-branding" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                                 <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                             </div>
                         </div><!-- End Portfolio Item -->
 
                         <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-deepclean">
-                            <img src="welcome/assets/img/masonry-portfolio/masonry-portfolio-7.jpg" class="img-fluid" alt="">
+                            <img src="/images/galeri-7.jpeg" class="img-fluid" alt="">
                             <div class="portfolio-info">
                                 <h4>App 3</h4>
                                 <p>Lorem ipsum, dolor sit</p>
-                                <a href="welcome/assets/img/masonry-portfolio/masonry-portfolio-7.jpg" title="App 3" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
-                                <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
-                            </div>
-                        </div><!-- End Portfolio Item -->
-
-                        <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-repaint">
-                            <img src="welcome/assets/img/masonry-portfolio/masonry-portfolio-8.jpg" class="img-fluid" alt="">
-                            <div class="portfolio-info">
-                                <h4>Product 3</h4>
-                                <p>Lorem ipsum, dolor sit</p>
-                                <a href="welcome/assets/img/masonry-portfolio/masonry-portfolio-8.jpg" title="Product 3" data-gallery="portfolio-gallery-product" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
-                                <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
-                            </div>
-                        </div><!-- End Portfolio Item -->
-
-                        <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-fastclean">
-                            <img src="welcome/assets/img/masonry-portfolio/masonry-portfolio-9.jpg" class="img-fluid" alt="">
-                            <div class="portfolio-info">
-                                <h4>Branding 3</h4>
-                                <p>Lorem ipsum, dolor sit</p>
-                                <a href="welcome/assets/img/masonry-portfolio/masonry-portfolio-9.jpg" title="Branding 2" data-gallery="portfolio-gallery-branding" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
+                                <a href="/images/galeri-7.jpeg" title="App 3" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                                 <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                             </div>
                         </div><!-- End Portfolio Item -->
@@ -766,7 +747,7 @@
                     <div class="col-xl-10">
                         <div class="text-center">
                             <h3>Tujuan Kami</h3>
-                            <p>"Memberikan layanan perawatan dan pembersihan sepatu terbaik dengan kualitas premium, agar setiap pelanggan Append dapat tampil percaya diri dengan sepatu yang bersih, wangi, dan nyaman dipakai."</p>
+                            <p>"Memberikan layanan perawatan dan pembersihan sepatu terbaik dengan kualitas premium, agar setiap pelanggan cuci sepatu Sooji dapat tampil percaya diri dengan sepatu yang bersih, wangi, dan nyaman dipakai."</p>
                             <!-- <a class="cta-btn" href="#">Call To Action</a> -->
                         </div>
                     </div>
@@ -784,10 +765,12 @@
                 <div class="row align-items-center">
 
                     <div class="col-lg-5 info" data-aos="fade-up" data-aos-delay="100">
-                        <h3>Testimonials</h3>
+                        <h3>Apa Kata Pelanggan Kami</h3>
                         <p>
-                            Ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-                            velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.
+                            “Sepatu saya yang sebelumnya kotor dan bau, sekarang kembali bersih dan wangi berkat Soooji! Prosesnya cepat dan hasilnya memuaskan. Recommended banget buat yang sayang sama sepatunya.”
+                        </p>
+                        <p>
+                            “Pelayanan ramah, harga terjangkau, dan hasil cucian sepatu sangat maksimal. Pokoknya langganan terus di Soooji!”
                         </p>
                     </div>
 
@@ -816,8 +799,8 @@
                                         <div class="d-flex">
                                             <img src="welcome/assets/img/testimonials/testimonials-1.jpg" class="testimonial-img flex-shrink-0" alt="">
                                             <div>
-                                                <h3>Saul Goodman</h3>
-                                                <h4>Ceo &amp; Founder</h4>
+                                                <h3>Ardiansyah Putra</h3>
+                                                <h4>Pelanggan Tetap</h4>
                                                 <div class="stars">
                                                     <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                                                 </div>
@@ -825,19 +808,19 @@
                                         </div>
                                         <p>
                                             <i class="bi bi-quote quote-icon-left"></i>
-                                            <span>Proin iaculis purus consequat sem cure digni ssim donec porttitora entum suscipit rhoncus. Accusantium quam, ultricies eget id, aliquam eget nibh et. Maecen aliquam, risus at semper.</span>
+                                            <span>Sepatu saya yang awalnya kotor banget sekarang jadi kayak baru lagi! Wangi, bersih, dan pelayanannya cepat. Soooji emang solusi terbaik buat sepatu kesayangan.</span>
                                             <i class="bi bi-quote quote-icon-right"></i>
                                         </p>
                                     </div>
-                                </div><!-- End testimonial item -->
+                                </div>
 
                                 <div class="swiper-slide">
                                     <div class="testimonial-item">
                                         <div class="d-flex">
                                             <img src="welcome/assets/img/testimonials/testimonials-2.jpg" class="testimonial-img flex-shrink-0" alt="">
                                             <div>
-                                                <h3>Sara Wilsson</h3>
-                                                <h4>Designer</h4>
+                                                <h3>Sinta Maharani</h3>
+                                                <h4>Karyawan Kantor</h4>
                                                 <div class="stars">
                                                     <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                                                 </div>
@@ -845,19 +828,19 @@
                                         </div>
                                         <p>
                                             <i class="bi bi-quote quote-icon-left"></i>
-                                            <span>Export tempor illum tamen malis malis eram quae irure esse labore quem cillum quid cillum eram malis quorum velit fore eram velit sunt aliqua noster fugiat irure amet legam anim culpa.</span>
+                                            <span>Selalu puas cuci sepatu di Soooji. Sepatu sneakers putihku jadi cling kayak baru beli, harganya juga ramah di kantong. Pokoknya recommended!</span>
                                             <i class="bi bi-quote quote-icon-right"></i>
                                         </p>
                                     </div>
-                                </div><!-- End testimonial item -->
+                                </div>
 
                                 <div class="swiper-slide">
                                     <div class="testimonial-item">
                                         <div class="d-flex">
                                             <img src="welcome/assets/img/testimonials/testimonials-3.jpg" class="testimonial-img flex-shrink-0" alt="">
                                             <div>
-                                                <h3>Jena Karlis</h3>
-                                                <h4>Store Owner</h4>
+                                                <h3>Rizky Ramadhan</h3>
+                                                <h4>Mahasiswa</h4>
                                                 <div class="stars">
                                                     <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                                                 </div>
@@ -865,19 +848,19 @@
                                         </div>
                                         <p>
                                             <i class="bi bi-quote quote-icon-left"></i>
-                                            <span>Enim nisi quem export duis labore cillum quae magna enim sint quorum nulla quem veniam duis minim tempor labore quem eram duis noster aute amet eram fore quis sint minim.</span>
+                                            <span>Awalnya coba-coba, ternyata hasilnya di luar ekspektasi! Sepatu bolaku yang kotor parah jadi mulus lagi. Soooji emang the best.</span>
                                             <i class="bi bi-quote quote-icon-right"></i>
                                         </p>
                                     </div>
-                                </div><!-- End testimonial item -->
+                                </div>
 
                                 <div class="swiper-slide">
                                     <div class="testimonial-item">
                                         <div class="d-flex">
                                             <img src="welcome/assets/img/testimonials/testimonials-4.jpg" class="testimonial-img flex-shrink-0" alt="">
                                             <div>
-                                                <h3>Matt Brandon</h3>
-                                                <h4>Freelancer</h4>
+                                                <h3>Novi Amelia</h3>
+                                                <h4>Pelanggan Baru</h4>
                                                 <div class="stars">
                                                     <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                                                 </div>
@@ -885,19 +868,19 @@
                                         </div>
                                         <p>
                                             <i class="bi bi-quote quote-icon-left"></i>
-                                            <span>Fugiat enim eram quae cillum dolore dolor amet nulla culpa multos export minim fugiat minim velit minim dolor enim duis veniam ipsum anim magna sunt elit fore quem dolore labore illum veniam.</span>
+                                            <span>Pelayanan ramah, pengerjaan cepat, hasil maksimal. Soooji bikin sepatu aku wangi kayak baru. Bakal jadi langganan nih!</span>
                                             <i class="bi bi-quote quote-icon-right"></i>
                                         </p>
                                     </div>
-                                </div><!-- End testimonial item -->
+                                </div>
 
                                 <div class="swiper-slide">
                                     <div class="testimonial-item">
                                         <div class="d-flex">
                                             <img src="welcome/assets/img/testimonials/testimonials-5.jpg" class="testimonial-img flex-shrink-0" alt="">
                                             <div>
-                                                <h3>John Larson</h3>
-                                                <h4>Entrepreneur</h4>
+                                                <h3>Andika Saputra</h3>
+                                                <h4>Content Creator</h4>
                                                 <div class="stars">
                                                     <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
                                                 </div>
@@ -905,13 +888,14 @@
                                         </div>
                                         <p>
                                             <i class="bi bi-quote quote-icon-left"></i>
-                                            <span>Quis quorum aliqua sint quem legam fore sunt eram irure aliqua veniam tempor noster veniam enim culpa labore duis sunt culpa nulla illum cillum fugiat legam esse veniam culpa fore nisi cillum quid.</span>
+                                            <span>Sepatu premium aku selalu aku titipin ke Soooji. Hasilnya konsisten bersih, nggak pernah gagal. Wajib coba!</span>
                                             <i class="bi bi-quote quote-icon-right"></i>
                                         </p>
                                     </div>
-                                </div><!-- End testimonial item -->
+                                </div>
 
                             </div>
+
                             <div class="swiper-pagination"></div>
                         </div>
 
@@ -1025,8 +1009,8 @@
 
             <!-- Section Title -->
             <div class="container section-title" data-aos="fade-up">
-                <h2>Contact</h2>
-                <p>Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
+                <h2>Kontak Kami</h2>
+                <p>Butuh layanan cuci sepatu terbaik di kota kamu? Hubungi Soooji sekarang untuk info harga, layanan, atau booking cuci sepatu favoritmu!</p>
             </div><!-- End Section Title -->
 
             <div class="container" data-aos="fade-up" data-aos-delay="100">
@@ -1039,36 +1023,37 @@
                             <div class="col-md-6">
                                 <div class="info-item" data-aos="fade" data-aos-delay="200">
                                     <i class="bi bi-geo-alt"></i>
-                                    <h3>Address</h3>
-                                    <p>A108 Adam Street</p>
-                                    <p>New York, NY 535022</p>
+                                    <h3>Alamat</h3>
+                                    <p>Jl. Setia Bakti Gang 3 No.24 Podosugih</p>
+                                    <p>Pekalongan, Jawa Tengah</p>
+                                    <p>Indonesia</p>
                                 </div>
                             </div><!-- End Info Item -->
 
                             <div class="col-md-6">
                                 <div class="info-item" data-aos="fade" data-aos-delay="300">
                                     <i class="bi bi-telephone"></i>
-                                    <h3>Call Us</h3>
-                                    <p>+1 5589 55488 55</p>
-                                    <p>+1 6678 254445 41</p>
+                                    <h3>Hubungi Kami</h3>
+                                    <p>087725161627</p>
                                 </div>
                             </div><!-- End Info Item -->
 
-                            <div class="col-md-6">
+                            <!-- <div class="col-md-6">
                                 <div class="info-item" data-aos="fade" data-aos-delay="400">
                                     <i class="bi bi-envelope"></i>
                                     <h3>Email Us</h3>
                                     <p>info@example.com</p>
                                     <p>contact@example.com</p>
                                 </div>
-                            </div><!-- End Info Item -->
+                            </div> -->
+                            <!-- End Info Item -->
 
                             <div class="col-md-6">
                                 <div class="info-item" data-aos="fade" data-aos-delay="500">
                                     <i class="bi bi-clock"></i>
-                                    <h3>Open Hours</h3>
-                                    <p>Monday - Friday</p>
-                                    <p>9:00AM - 05:00PM</p>
+                                    <h3>Jam Buka</h3>
+                                    <p>Senin - Sabtu</p>
+                                    <p>09:00 WIB - 21:00 WIB</p>
                                 </div>
                             </div><!-- End Info Item -->
 
@@ -1077,36 +1062,30 @@
                     </div>
 
                     <div class="col-lg-6">
-                        <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
+                        <form onsubmit="return sendToWhatsApp();" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
                             <div class="row gy-4">
 
                                 <div class="col-md-6">
-                                    <input type="text" name="name" class="form-control" placeholder="Your Name" required="">
-                                </div>
-
-                                <div class="col-md-6 ">
-                                    <input type="email" class="form-control" name="email" placeholder="Your Email" required="">
+                                    <input type="text" id="name" class="form-control" placeholder="Nama Kamu" required="">
                                 </div>
 
                                 <div class="col-12">
-                                    <input type="text" class="form-control" name="subject" placeholder="Subject" required="">
+                                    <input type="text" id="subject" class="form-control" placeholder="Judul Pesan" required="">
                                 </div>
 
                                 <div class="col-12">
-                                    <textarea class="form-control" name="message" rows="6" placeholder="Message" required=""></textarea>
+                                    <textarea class="form-control" id="message" rows="6" placeholder="Pesan Kamu" required=""></textarea>
                                 </div>
 
                                 <div class="col-12 text-center">
-                                    <div class="loading">Loading</div>
-                                    <div class="error-message"></div>
-                                    <div class="sent-message">Your message has been sent. Thank you!</div>
-
-                                    <button type="submit">Send Message</button>
+                                    <button type="submit">Kirim via WhatsApp</button>
                                 </div>
 
                             </div>
                         </form>
-                    </div><!-- End Contact Form -->
+                    </div>
+
+                    <!-- End Contact Form -->
 
                 </div>
 
@@ -1120,24 +1099,24 @@
 
         <div class="container footer-top">
             <div class="row gy-4">
+
                 <div class="col-lg-5 col-md-12 footer-about">
                     <a href="index.html" class="logo d-flex align-items-center">
-                        <span class="sitename">Append</span>
+                        <span class="sitename">Soooji</span>
                     </a>
-                    <p>Append adalah layanan cuci sepatu profesional yang siap merawat dan membersihkan sepatu kesayangan kamu hingga seperti baru lagi. Percayakan kebersihan sepatumu hanya di Append!</p>
+                    <p>Soooji adalah layanan cuci sepatu profesional yang siap merawat, membersihkan, dan menjaga sepatu kesayangan kamu tetap bersih, wangi, dan tampil seperti baru. Solusi sepatu bersih tanpa ribet!</p>
                     <div class="social-links d-flex mt-4">
-                        <a href=""><i class="bi bi-twitter-x"></i></a>
-                        <a href=""><i class="bi bi-facebook"></i></a>
-                        <a href=""><i class="bi bi-instagram"></i></a>
-                        <a href=""><i class="bi bi-linkedin"></i></a>
+                        <a href="https://www.instagram.com/soooji.id/"><i class="bi bi-instagram"></i></a>
+                        <a href="https://web.facebook.com/profile.php?id=61576134735705#"><i class="bi bi-facebook"></i></a>
+                        <a href="https://wa.me/6287725161627"><i class="bi bi-whatsapp"></i></a>
                     </div>
                 </div>
 
                 <div class="col-lg-2 col-6 footer-links">
-                    <h4>Link</h4>
+                    <h4>Menu</h4>
                     <ul>
                         <li><a href="#">Beranda</a></li>
-                        <li><a href="#">Tentang</a></li>
+                        <li><a href="#">Tentang Kami</a></li>
                         <li><a href="#">Layanan</a></li>
                         <li><a href="#">Galeri</a></li>
                         <li><a href="#">Testimoni</a></li>
@@ -1150,35 +1129,32 @@
                         <li><a href="#">Cuci Sepatu Premium</a></li>
                         <li><a href="#">Deep Cleaning</a></li>
                         <li><a href="#">Whitening Treatment</a></li>
-                        <li><a href="#">Sepatu Custom Care</a></li>
-                        <li><a href="#">Antar Jemput Sepatu</a></li>
+                        <li><a href="#">Custom Sepatu</a></li>
+                        <li><a href="#">Jemput & Antar Sepatu</a></li>
                     </ul>
                 </div>
 
                 <div class="col-lg-3 col-md-12 footer-contact text-center text-md-start">
                     <h4>Hubungi Kami</h4>
-                    <p>A108 Adam Street</p>
-                    <p>New York, NY 535022</p>
-                    <p>United States</p>
-                    <p class="mt-4"><strong>Phone:</strong> <span>+1 5589 55488 55</span></p>
-                    <p><strong>Email:</strong> <span>info@example.com</span></p>
+                    <p>Jl. Setia Bakti Gang 3 No.24 Podosugih</p>
+                    <p>Pekalongan, Jawa Tengah</p>
+                    <p>Indonesia</p>
+                    <p class="mt-4"><strong>WhatsApp:</strong> <span>+62 877 2516 1627</span></p>
+                    <!-- <p><strong>Email:</strong> <span>cs@soooji.id</span></p> -->
                 </div>
 
             </div>
         </div>
 
         <div class="container copyright text-center mt-4">
-            <p>© <span>Copyright</span> <strong class="sitename">Append</strong> <span>All Rights Reserved</span></p>
+            <p>© <span>Copyright</span> <strong class="sitename">Soooji</strong> <span>All Rights Reserved</span></p>
             <div class="credits">
-                <!-- All the links in the footer should remain intact. -->
-                <!-- You can delete the links only if you've purchased the pro version. -->
-                <!-- Licensing information: https://bootstrapmade.com/license/ -->
-                <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
-                Designed by Khaerul Anam
+                Designed by Rizqi
             </div>
         </div>
 
     </footer>
+
 
     <!-- Scroll Top -->
     <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
@@ -1198,6 +1174,26 @@
 
     <!-- Main JS File -->
     <script src="welcome/assets/js/main.js"></script>
+
+    <!-- Function send message to WhatsApp -->
+    <script>
+        function sendToWhatsApp() {
+            var name = document.getElementById("name").value;
+            var subject = document.getElementById("subject").value;
+            var message = document.getElementById("message").value;
+
+            var noWa = "6287725161627"; // ganti ke nomor WA kamu (pakai kode negara, 62 untuk Indonesia)
+
+            var text = "Halo Soooji! Saya " + name + "%0A" +
+                "Judul: " + subject + "%0A" +
+                "Pesan: " + message;
+
+            var url = "https://wa.me/" + noWa + "?text=" + text;
+
+            window.open(url, '_blank');
+            return false;
+        }
+    </script>
 
 </body>
 

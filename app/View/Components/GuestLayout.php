@@ -9,7 +9,7 @@ class GuestLayout extends Component
 {
     public $title;
 
-    public function __construct($title = 'Cuci Sepatu Sneat')
+    public function __construct($title = 'Cuci Sepatu Soooji')
     {
         $this->title = $title;
     }

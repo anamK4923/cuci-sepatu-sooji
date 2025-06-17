@@ -2,7 +2,7 @@
 
 @section('subtitle', 'Dashboard Member')
 @section('content_header_title', 'Dashboard')
-@section('content_header_subtitle', 'Sneat - Member Dashboard')
+@section('content_header_subtitle', 'Soooji - Member Dashboard')
 
 @section('content_body')
 

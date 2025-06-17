@@ -2,136 +2,161 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class OrderController extends Controller
 {
-    public function store(Request $request)
-    {
-        try {
-            // Log request data untuk debugging
-            Log::info('Order request data:', $request->all());
-
-            // Validasi input
-            $validatedData = $request->validate([
-                // 'service_name' => 'required|string|max:255',
-                // 'customer_name' => 'required|string|max:255',
-                // 'customer_phone' => 'required|string|max:20',
-                'delivery_method' => 'required|in:pickup,drop_off',
-                'alamat_pickup' => 'nullable|string|required_if:delivery_method,pickup',
-                'pickup_schedule' => 'nullable|date|required_if:delivery_method,pickup',
-                'notes' => 'nullable|string',
-                'total_price' => 'required|numeric|min:0',
-            ]);
-
-            // Generate unique order ID untuk Midtrans
-            $midtransOrderId = 'ORDER-' . Str::upper(Str::random(8)) . '-' . time();
-
-            // Buat order baru menggunakan model
-            $order = Order::create([
-                'user_id' => 1, // Default ke 1 jika tidak ada auth
-                // 'service_name' => $validatedData['service_name'],
-                // 'customer_name' => $validatedData['customer_name'],
-                // 'customer_phone' => $validatedData['customer_phone'],
-                'delivery_method' => 'drop_off',
-                'alamat_pickup' => $validatedData['alamat_pickup'],
-                'pickup_schedule' => $validatedData['pickup_schedule'],
-                'notes' => $validatedData['notes'],
-                'status' => 'in_process',
-                'payment_status' => 'paid',
-                'total_price' => $validatedData['total_price'],
-                'midtrans_order_id' => $midtransOrderId,
-            ]);
-
-            Log::info('Order created successfully:', ['order_id' => $order->id]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Pesanan berhasil dibuat',
-                'data' => [
-                    'order_id' => $order->id,
-                    'midtrans_order_id' => $order->midtrans_order_id,
-                    'status' => $order->status,
-                    'total_price' => $order->formatted_price
-                ]
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::warning('Validation error:', $e->errors());
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Data tidak valid',
-                'errors' => $e->errors()
-            ], 422);
-        } catch (\Exception $e) {
-            Log::error('Order creation error: ' . $e->getMessage());
-            Log::error('Stack trace: ' . $e->getTraceAsString());
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat membuat pesanan: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function show(Order $order)
-    {
-        try {
-            return response()->json([
-                'success' => true,
-                'data' => $order->load('user') // Load relationship jika diperlukan
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Order tidak ditemukan'
-            ], 404);
-        }
-    }
-
+    /**
+     * Display customer's orders
+     */
     public function index()
     {
-        try {
-            $orders = Order::with('user')
-                ->orderBy('created_at', 'desc')
-                ->paginate(10);
+        $orders = Order::with(['service'])
+            ->forUser(Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-            return response()->json([
-                'success' => true,
-                'data' => $orders
+        return view('member.orders.index', compact('orders'));
+    }
+
+    /**
+     * Show the form for creating a new order
+     */
+    public function create(Service $service)
+    {
+        return view('member.orders.create', compact('service'));
+    }
+
+    /**
+     * Store a newly created order
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'service_id' => 'required|exists:services,id',
+            'delivery_method' => ['required', Rule::in([Order::DELIVERY_ANTAR_JEMPUT, Order::DELIVERY_DROP_OFF])],
+            'alamat_pickup' => 'required_if:delivery_method,' . Order::DELIVERY_ANTAR_JEMPUT . '|nullable|string|max:1000',
+            'pickup_schedule' => 'required_if:delivery_method,' . Order::DELIVERY_ANTAR_JEMPUT . '|nullable|date|after:+2 hours',
+            'notes' => 'nullable|string|max:1000',
+            'total_price' => 'required|numeric|min:0',
+        ], [
+            'service_id.required' => 'Layanan harus dipilih.',
+            'service_id.exists' => 'Layanan yang dipilih tidak valid.',
+            'delivery_method.required' => 'Metode pengiriman harus dipilih.',
+            'delivery_method.in' => 'Metode pengiriman tidak valid.',
+            'alamat_pickup.required_if' => 'Alamat penjemputan wajib diisi untuk metode antar jemput.',
+            'alamat_pickup.max' => 'Alamat penjemputan maksimal 1000 karakter.',
+            'pickup_schedule.required_if' => 'Jadwal penjemputan wajib diisi untuk metode antar jemput.',
+            'pickup_schedule.date' => 'Format jadwal penjemputan tidak valid.',
+            'pickup_schedule.after' => 'Jadwal penjemputan minimal 2 jam dari sekarang.',
+            'notes.max' => 'Catatan maksimal 1000 karakter.',
+            'total_price.required' => 'Total harga harus ada.',
+            'total_price.numeric' => 'Total harga harus berupa angka.',
+            'total_price.min' => 'Total harga tidak boleh negatif.',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Get service to verify price
+            $service = Service::findOrFail($validated['service_id']);
+
+            // Verify total price matches service price
+            if ($validated['total_price'] != $service->price) {
+                return back()->withErrors(['total_price' => 'Harga tidak sesuai dengan layanan yang dipilih.']);
+            }
+
+            // Create order
+            $order = Order::create([
+                'user_id' => Auth::id(),
+                'service_id' => $validated['service_id'],
+                'delivery_method' => $validated['delivery_method'],
+                'alamat_pickup' => $validated['alamat_pickup'],
+                'pickup_schedule' => $validated['pickup_schedule'],
+                'notes' => $validated['notes'],
+                'total_price' => $validated['total_price'],
+                'status' => Order::STATUS_WAITING_PICKUP,
+                'payment_status' => Order::PAYMENT_PENDING,
+                'midtrans_order_id' => $this->generateMidtransOrderId($service->id),
             ]);
+
+            DB::commit();
+
+            return redirect()->route('member.orders.status')
+                ->with('success', 'Pesanan berhasil dibuat! Silakan lakukan pembayaran untuk melanjutkan proses.');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal mengambil data pesanan'
-            ], 500);
+            DB::rollBack();
+
+            return back()->withErrors(['error' => 'Terjadi kesalahan saat membuat pesanan. Silakan coba lagi.'])
+                ->withInput();
         }
     }
 
-    public function updateStatus(Request $request, Order $order)
+    /**
+     * Display order status page
+     */
+    public function status()
     {
-        try {
-            $request->validate([
-                'status' => 'required|in:pending,confirmed,in_progress,completed,cancelled',
-                'payment_status' => 'sometimes|in:unpaid,paid,refunded'
-            ]);
+        $orders = Order::with(['service'])
+            ->forUser(Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-            $order->update($request->only(['status', 'payment_status']));
+        return view('member.orders.status', compact('orders'));
+    }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Status pesanan berhasil diupdate',
-                'data' => $order
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal mengupdate status pesanan'
-            ], 500);
+    /**
+     * Show the specified order
+     */
+    public function show(Order $order)
+    {
+        // Ensure user can only view their own orders
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized access to order.');
         }
+
+        $order->load(['service']);
+
+        return view('member.orders.show', compact('order'));
+    }
+
+    /**
+     * Cancel an order
+     */
+    public function cancel(Order $order)
+    {
+        // Ensure user can only cancel their own orders
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized access to order.');
+        }
+
+        // Check if order can be cancelled
+        if (in_array($order->status, [Order::STATUS_COMPLETED, Order::STATUS_CANCELLED])) {
+            return back()->withErrors(['error' => 'Pesanan tidak dapat dibatalkan.']);
+        }
+
+        try {
+            $order->update([
+                'status' => Order::STATUS_CANCELLED
+            ]);
+
+            return back()->with('success', 'Pesanan berhasil dibatalkan.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Terjadi kesalahan saat membatalkan pesanan.']);
+        }
+    }
+
+    /**
+     * Generate Midtrans order ID
+     */
+    private function generateMidtransOrderId($serviceId): string
+    {
+        return 'SOOOJI-' . $serviceId . '-' . time() . '-' . Auth::id();
     }
 }

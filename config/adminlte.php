@@ -31,7 +31,11 @@ return [
     */
 
     'use_ico_only' => false,
-    'use_full_favicon' => false,
+    'use_full_favicon' => true,
+    'favicon' => [
+        'path' => 'images/web/apple-touch-icon.png',
+        'type' => 'image/png', // Can be 'image/x-icon' or 'image/png'
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -63,7 +67,7 @@ return [
     |
     */
 
-    'logo' => '<b>Cuci Sepatu</b> Sneat',
+    'logo' => '<b>Cuci Sepatu</b> Soooji',
     'logo_img' => 'images/web/apple-touch-icon.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
@@ -309,22 +313,22 @@ return [
         //     'type' => 'darkmode-widget',
         //     'topnav_right' => true,     // Or "topnav => true" to place on the left.
         // ],
-        [
-            'type' => 'navbar-notification',
-            'id' => 'my-notification',                // An ID attribute (required).
-            'icon' => 'fas fa-bell',                  // A font awesome icon (required).
-            'icon_color' => 'warning',                // The initial icon color (optional).
-            'label' => 0,                             // The initial label for the badge (optional).
-            'label_color' => 'danger',                // The initial badge color (optional).
-            'url' => 'notifications/show',            // The url to access all notifications/elements (required).
-            'topnav_right' => true,                   // Or "topnav => true" to place on the left (required).
-            'dropdown_mode' => true,                  // Enables the dropdown mode (optional).
-            'dropdown_flabel' => 'All notifications', // The label for the dropdown footer link (optional).
-            'update_cfg' => [
-                'url' => 'notifications/get',         // The url to periodically fetch new data (optional).
-                'period' => 30,                       // The update period for get new data (in seconds, optional).
-            ],
-        ],
+        // [
+        //     'type' => 'navbar-notification',
+        //     'id' => 'my-notification',                // An ID attribute (required).
+        //     'icon' => 'fas fa-bell',                  // A font awesome icon (required).
+        //     'icon_color' => 'warning',                // The initial icon color (optional).
+        //     'label' => 0,                             // The initial label for the badge (optional).
+        //     'label_color' => 'danger',                // The initial badge color (optional).
+        //     'url' => 'notifications/show',            // The url to access all notifications/elements (required).
+        //     'topnav_right' => true,                   // Or "topnav => true" to place on the left (required).
+        //     'dropdown_mode' => true,                  // Enables the dropdown mode (optional).
+        //     'dropdown_flabel' => 'All notifications', // The label for the dropdown footer link (optional).
+        //     'update_cfg' => [
+        //         'url' => 'notifications/get',         // The url to periodically fetch new data (optional).
+        //         'period' => 30,                       // The update period for get new data (in seconds, optional).
+        //     ],
+        // ],
         [
             'type' => 'fullscreen-widget',
             'topnav_right' => false,
@@ -342,13 +346,13 @@ return [
             'route' => 'dashboard.admin',
             'can' => 'admin-only',
         ],
-        [
-            'text' => 'Dashboard',
-            'url' => 'dashboard-member',
-            'icon' => 'fas fa-tachometer-alt',
-            'route' => 'dashboard.member',
-            'can' => 'member-only',
-        ],
+        // [
+        //     'text' => 'Dashboard',
+        //     'url' => 'dashboard-member',
+        //     'icon' => 'fas fa-tachometer-alt',
+        //     'route' => 'dashboard.member',
+        //     'can' => 'member-only',
+        // ],
         [
             'text' => 'Daftar Pelayanan',
             'url' => 'services-admin',
@@ -358,8 +362,24 @@ return [
             'can' => 'admin-only',
         ],
         [
+            'text' => 'Daftar Pemesanan',
+            'url' => 'orders-admin',
+            'icon' => 'fab fa-servicestack',
+            // 'label' => 4,
+            // 'label_color' => 'success',
+            'can' => 'admin-only',
+        ],
+        [
             'text' => 'Daftar Pelayanan',
             'url' => 'services-member',
+            'icon' => 'fab fa-servicestack',
+            // 'label' => 4,
+            // 'label_color' => 'success',
+            'can' => 'member-only',
+        ],
+        [
+            'text' => 'Status Pemesanan',
+            'url' => 'orders-member/status',
             'icon' => 'fab fa-servicestack',
             // 'label' => 4,
             // 'label_color' => 'success',
