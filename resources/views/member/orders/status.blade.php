@@ -19,6 +19,28 @@
         </div>
         @endif
 
+        <!-- Warning Alert -->
+        @if(session('warning'))
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            <strong>Perhatian!</strong> {{ session('warning') }}
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
+        </div>
+        @endif
+
+        <!-- Error Alert -->
+        @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-times-circle mr-2"></i>
+            <strong>Error!</strong> {{ session('error') }}
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
+        </div>
+        @endif
+
         <!-- Orders List -->
         @forelse($orders as $order)
         <div class="card mb-4">
@@ -41,7 +63,7 @@
                         'picked_up' => ['class' => 'info', 'icon' => 'truck', 'text' => 'Sudah Dijemput'],
                         'in_process' => ['class' => 'primary', 'icon' => 'cogs', 'text' => 'Sedang Diproses'],
                         'ready' => ['class' => 'success', 'icon' => 'check', 'text' => 'Siap Diambil'],
-                        'completed' => ['class' => 'success', 'icon' => 'check-circle', 'text' => 'Selesai'],
+                        'done' => ['class' => 'success', 'icon' => 'check-circle', 'text' => 'Selesai'],
                         'cancelled' => ['class' => 'danger', 'icon' => 'times', 'text' => 'Dibatalkan']
                         ];
                         $status = $statusConfig[$order->status] ?? ['class' => 'secondary', 'icon' => 'question', 'text' => 'Unknown'];
@@ -69,7 +91,7 @@
                             <i class="fas fa-money-bill-wave mr-1"></i>
                             Total Harga
                         </h6>
-                        <p class="mb-2">Rp{{ number_format($order->total_price, 0, ',', '.') }}</p>
+                        <p class="mb-2">{{ $order->formatted_total_price }}</p>
                     </div>
 
                     <!-- Delivery Info -->
@@ -100,8 +122,10 @@
                         <p class="mb-2">
                             @if($order->payment_status == 'pending')
                             <span class="badge badge-warning">Menunggu Pembayaran</span>
-                            @else
+                            @elseif($order->payment_status == 'paid')
                             <span class="badge badge-success">Sudah Dibayar</span>
+                            @else
+                            <span class="badge badge-danger">Gagal</span>
                             @endif
                         </p>
 
@@ -157,7 +181,7 @@
                             'picked_up' => 'Sudah Dijemput',
                             'in_process' => 'Sedang Diproses',
                             'ready' => 'Siap Diambil',
-                            'completed' => 'Selesai'
+                            'done' => 'Selesai'
                             ];
                             $currentStepIndex = array_search($order->status, array_keys($steps));
                             @endphp
@@ -193,10 +217,14 @@
             <div class="card-footer">
                 <div class="row">
                     <div class="col-md-6">
-                        @if($order->payment_status == 'pending')
-                        <button class="btn btn-warning" onclick="payOrder('{{ $order->id }}')">
+                        @if($order->is_payable)
+                        <button class="btn btn-warning" onclick="payOrder('{{ $order->id }}')" id="pay-button-{{ $order->id }}">
                             <i class="fas fa-credit-card mr-2"></i>
                             Bayar Sekarang
+                        </button>
+                        <button class="btn btn-info btn-sm ml-2" onclick="checkPaymentStatus('{{ $order->id }}')">
+                            <i class="fas fa-sync mr-1"></i>
+                            Cek Status
                         </button>
                         @endif
                     </div>
@@ -228,21 +256,219 @@
 @stop
 
 @section('js')
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Midtrans Snap JS - Load conditionally -->
 <script>
-    function payOrder(orderId) {
-        // Placeholder for payment integration
-        Swal.fire({
-            title: 'Pembayaran',
-            text: 'Fitur pembayaran akan segera tersedia!',
-            icon: 'info',
-            confirmButtonText: 'OK'
+    // Global variables
+    let snapLoaded = false;
+    let autoRefreshInterval = null;
+
+    // Function to load Midtrans Snap dynamically
+    function loadMidtransSnap() {
+        return new Promise((resolve, reject) => {
+            if (snapLoaded && typeof snap !== 'undefined') {
+                resolve();
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = 'https://app.sandbox.midtrans.com/snap/snap.js';
+            script.setAttribute('data-client-key', '{{ config("midtrans.client_key") }}');
+
+            script.onload = () => {
+                snapLoaded = true;
+                console.log('Midtrans Snap loaded successfully');
+                resolve();
+            };
+
+            script.onerror = () => {
+                console.error('Failed to load Midtrans Snap');
+                reject(new Error('Failed to load Midtrans Snap'));
+            };
+
+            document.head.appendChild(script);
         });
     }
 
-    // Auto refresh every 30 seconds
-    setInterval(function() {
-        location.reload();
-    }, 30000);
+    // Stop auto refresh when payment is in progress
+    function stopAutoRefresh() {
+        if (autoRefreshInterval) {
+            clearInterval(autoRefreshInterval);
+            autoRefreshInterval = null;
+            console.log('Auto refresh stopped');
+        }
+    }
+
+    // Start auto refresh
+    function startAutoRefresh() {
+        stopAutoRefresh(); // Clear existing interval
+        autoRefreshInterval = setInterval(function() {
+            console.log('Auto refreshing page...');
+            location.reload();
+        }, 60000); // Refresh every 60 seconds instead of 30
+    }
+
+    async function payOrder(orderId) {
+        const button = document.getElementById(`pay-button-${orderId}`);
+
+        // Stop auto refresh during payment
+        stopAutoRefresh();
+
+        // Disable button
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
+
+        try {
+            // Load Midtrans Snap if not loaded
+            await loadMidtransSnap();
+
+            // Create payment token
+            const response = await fetch(`/payment/create/${orderId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || `HTTP error! status: ${response.status}`);
+            }
+
+            if (data.snap_token) {
+                // Open Midtrans payment popup
+                snap.pay(data.snap_token, {
+                    onSuccess: function(result) {
+                        console.log('Payment success:', result);
+                        Swal.fire({
+                            title: 'Pembayaran Berhasil!',
+                            text: 'Terima kasih, pembayaran Anda telah berhasil diproses.',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    },
+                    onPending: function(result) {
+                        console.log('Payment pending:', result);
+                        Swal.fire({
+                            title: 'Pembayaran Pending',
+                            text: 'Pembayaran Anda sedang diproses. Silakan tunggu konfirmasi.',
+                            icon: 'info',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            startAutoRefresh(); // Resume auto refresh
+                            location.reload();
+                        });
+                    },
+                    onError: function(result) {
+                        console.log('Payment error:', result);
+                        Swal.fire({
+                            title: 'Pembayaran Gagal',
+                            text: 'Terjadi kesalahan dalam proses pembayaran. Silakan coba lagi.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                        resetPaymentButton(button);
+                        startAutoRefresh(); // Resume auto refresh
+                    },
+                    onClose: function() {
+                        console.log('Payment popup closed');
+                        resetPaymentButton(button);
+                        startAutoRefresh(); // Resume auto refresh
+                    }
+                });
+            } else {
+                throw new Error('No snap token received');
+            }
+        } catch (error) {
+            console.error('Payment error:', error);
+
+            let errorMessage = 'Gagal membuat pembayaran. Silakan coba lagi.';
+
+            if (error.message.includes('Failed to load Midtrans Snap')) {
+                errorMessage = 'Gagal memuat sistem pembayaran. Pastikan koneksi internet stabil dan tidak ada ad blocker yang aktif.';
+            } else if (error.message.includes('HTTP error')) {
+                errorMessage = 'Terjadi kesalahan server. Silakan coba lagi dalam beberapa saat.';
+            }
+
+            Swal.fire({
+                title: 'Error',
+                text: errorMessage,
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+
+            resetPaymentButton(button);
+            startAutoRefresh(); // Resume auto refresh
+        }
+    }
+
+    function resetPaymentButton(button) {
+        button.disabled = false;
+        button.innerHTML = '<i class="fas fa-credit-card mr-2"></i>Bayar Sekarang';
+    }
+
+    async function checkPaymentStatus(orderId) {
+        try {
+            const response = await fetch(`/payment/status/${orderId}`, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            let statusText = data.transaction_status || 'Tidak diketahui';
+            let paymentType = data.payment_type || 'Tidak diketahui';
+            let transactionTime = data.transaction_time || 'Tidak diketahui';
+
+            Swal.fire({
+                title: 'Status Pembayaran',
+                html: `
+                <div class="text-left">
+                    <p><strong>Status:</strong> ${statusText}</p>
+                    <p><strong>Metode:</strong> ${paymentType}</p>
+                    <p><strong>Waktu:</strong> ${transactionTime}</p>
+                </div>
+            `,
+                icon: 'info',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                if (data.transaction_status === 'settlement' || data.transaction_status === 'capture') {
+                    location.reload();
+                }
+            });
+        } catch (error) {
+            console.error('Status check error:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Gagal mengecek status pembayaran. Silakan coba lagi.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    }
+
+    // Initialize auto refresh when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        startAutoRefresh();
+        console.log('Page loaded, auto refresh started');
+    });
+
+    // Stop auto refresh when page is about to unload
+    window.addEventListener('beforeunload', function() {
+        stopAutoRefresh();
+    });
 </script>
 @stop
 
@@ -355,7 +581,3 @@
     }
 </style>
 @stop
-
-@push('js')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-@endpush

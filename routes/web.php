@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ServiceController;
 use Illuminate\Support\Facades\Auth;
@@ -14,15 +15,12 @@ Route::get('/', [LandingController::class, 'index'])->name('landing');
 
 Route::middleware(['admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'indexAdmin'])->name('dashboard.admin');
-    // Route::get('/services-admin', [ServiceController::class, 'indexAdmin'])->name('services.admin');
     Route::get('/services-admin', [ServiceController::class, 'index'])->name('services.admin');
     Route::get('/services-admin/create', [ServiceController::class, 'create'])->name('services.create');
     Route::post('/services-admin', [ServiceController::class, 'store'])->name('services.store');
     Route::get('/services-admin/{service}/edit', [ServiceController::class, 'edit'])->name('services.edit');
     Route::put('/services-admin/{service}', [ServiceController::class, 'update'])->name('services.update');
     Route::delete('/services-admin/{service}', [ServiceController::class, 'destroy'])->name('services.destroy');
-    // Route::resource('services-admin', ServiceController::class);
-
 
     // Orders Management
     Route::get('orders-admin', [AdminOrderController::class, 'index'])->name('admin.orders.index');
@@ -36,8 +34,6 @@ Route::middleware(['admin'])->group(function () {
 
 Route::middleware(['member'])->group(function () {
     Route::get('/dashboard-member', [DashboardController::class, 'indexMember'])->name('dashboard.member');
-    // Route::get('/services-member', [ServicesController::class, 'indexMember'])->name('services.member');
-    // Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
 
     // Services Routes
     Route::get('/services-member', [ServiceController::class, 'indexMember'])->name('member.services.index');
@@ -50,12 +46,22 @@ Route::middleware(['member'])->group(function () {
     Route::get('/orders-member/status', [OrderController::class, 'status'])->name('member.orders.status');
     Route::get('/orders-member/{order}', [OrderController::class, 'show'])->name('member.orders.show');
     Route::patch('/orders-member/{order}/cancel', [OrderController::class, 'cancel'])->name('member.orders.cancel');
+
+    // Payment Routes
+    Route::prefix('payment')->name('member.payment.')->group(function () {
+        Route::post('/create/{order}', [PaymentController::class, 'createPayment'])->name('create');
+        Route::get('/status/{order}', [PaymentController::class, 'checkStatus'])->name('status');
+        Route::get('/finish', [PaymentController::class, 'finish'])->name('finish');
+        Route::get('/unfinish', [PaymentController::class, 'unfinish'])->name('unfinish');
+        Route::get('/error', [PaymentController::class, 'error'])->name('error');
+    });
 });
 
+// Midtrans Webhook (no auth required)
+Route::post('/payment/notification', [PaymentController::class, 'notification'])->name('payment.notification');
 
 // API Routes for AJAX calls
 Route::middleware(['auth'])->prefix('api')->group(function () {
-
     // Customer API
     Route::prefix('customer')->name('api.customer.')->group(function () {
         Route::get('/orders/{order}/status', function (App\Models\Order $order) {
@@ -77,15 +83,10 @@ Route::middleware(['auth'])->prefix('api')->group(function () {
     });
 });
 
-
 Route::get(
     'notifications/get',
     [NotificationsController::class, 'getNotificationsData']
 )->name('notifications.get');
-
-// Route::get('/dashboard', function () {
-//     return view('dashboard');
-// })->middleware(['auth', 'verified   '])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

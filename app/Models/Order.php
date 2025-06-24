@@ -41,6 +41,7 @@ class Order extends Model
     // Payment status constants
     const PAYMENT_PENDING = 'pending';
     const PAYMENT_PAID = 'paid';
+    const PAYMENT_FAILED = 'failed';
 
     // Delivery method constants
     const DELIVERY_ANTAR_JEMPUT = 'antar_jemput';
@@ -84,7 +85,13 @@ class Order extends Model
      */
     public function getPaymentStatusLabelAttribute(): string
     {
-        return $this->payment_status === self::PAYMENT_PAID ? 'Sudah Dibayar' : 'Menunggu Pembayaran';
+        $labels = [
+            self::PAYMENT_PENDING => 'Menunggu Pembayaran',
+            self::PAYMENT_PAID => 'Sudah Dibayar',
+            self::PAYMENT_FAILED => 'Pembayaran Gagal',
+        ];
+
+        return $labels[$this->payment_status] ?? 'Unknown';
     }
 
     /**
@@ -93,6 +100,23 @@ class Order extends Model
     public function getDeliveryMethodLabelAttribute(): string
     {
         return $this->delivery_method === self::DELIVERY_ANTAR_JEMPUT ? 'Antar Jemput' : 'Drop Off';
+    }
+
+    /**
+     * Get formatted total price
+     */
+    public function getFormattedTotalPriceAttribute(): string
+    {
+        return 'Rp ' . number_format($this->total_price, 0, ',', '.');
+    }
+
+    /**
+     * Check if order can be paid
+     */
+    public function getIsPayableAttribute(): bool
+    {
+        return $this->payment_status === self::PAYMENT_PENDING &&
+            !in_array($this->status, [self::STATUS_COMPLETED, self::STATUS_CANCELLED]);
     }
 
     /**

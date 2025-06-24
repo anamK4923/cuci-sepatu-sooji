@@ -123,6 +123,33 @@
                             <i class="fas fa-calendar-alt text-warning mr-1"></i>
                             Jadwal Penjemputan
                         </label>
+                        <select name="pickup_schedule"
+                            id="pickup_schedule"
+                            class="form-control @error('pickup_schedule') is-invalid @enderror">
+                            <option value="">Pilih Jadwal Penjemputan</option>
+                            <option value="10:00" {{ old('pickup_schedule') == '10:00' ? 'selected' : '' }}>
+                                <i class="fas fa-sun"></i> Jam 10.00 WIB - Pagi
+                            </option>
+                            <option value="14:00" {{ old('pickup_schedule') == '14:00' ? 'selected' : '' }}>
+                                <i class="fas fa-sun"></i> Jam 14.00 WIB - Siang
+                            </option>
+                            <option value="16:00" {{ old('pickup_schedule') == '16:00' ? 'selected' : '' }}>
+                                <i class="fas fa-cloud-sun"></i> Jam 16.00 WIB - Sore
+                            </option>
+                        </select>
+                        @error('pickup_schedule')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="form-text text-muted">
+                            <i class="fas fa-clock mr-1"></i>
+                            Jadwal penjemputan untuk hari transaksi
+                        </small>
+                    </div>
+                    <!-- <div class="form-group" id="pickup_schedule_group" style="display: none;">
+                        <label for="pickup_schedule" class="font-weight-bold">
+                            <i class="fas fa-calendar-alt text-warning mr-1"></i>
+                            Jadwal Penjemputan
+                        </label>
                         <input type="datetime-local"
                             name="pickup_schedule"
                             id="pickup_schedule"
@@ -136,7 +163,7 @@
                             <i class="fas fa-clock mr-1"></i>
                             Minimal 2 jam dari sekarang
                         </small>
-                    </div>
+                    </div> -->
 
                     <!-- Notes -->
                     <div class="form-group">
