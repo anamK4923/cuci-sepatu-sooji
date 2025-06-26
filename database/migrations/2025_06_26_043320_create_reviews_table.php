@@ -11,12 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ratings', function (Blueprint $table) {
+        Schema::create('reviews', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained()->onDelete('cascade');
-            $table->tinyInteger('rating');
-            $table->text('review')->nullable();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->integer('rating')->unsigned()->comment('Rating 1-5');
+            $table->text('comment')->nullable();
             $table->timestamps();
+
+            // Ensure one review per order
+            $table->unique('order_id');
+
+            // Index for better performance
+            $table->index(['user_id', 'created_at']);
         });
     }
 
@@ -25,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('table_rating');
+        Schema::dropIfExists('reviews');
     }
 };

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Order extends Model
 {
@@ -61,6 +62,14 @@ class Order extends Model
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
+    }
+
+    /**
+     * Get the review for this order
+     */
+    public function review(): HasOne
+    {
+        return $this->hasOne(Review::class);
     }
 
     /**
@@ -144,6 +153,24 @@ class Order extends Model
     }
 
     /**
+     * Check if order can be reviewed
+     */
+    public function canBeReviewed(): bool
+    {
+        return $this->status === self::STATUS_COMPLETED &&
+            $this->payment_status === self::PAYMENT_PAID &&
+            !$this->review;
+    }
+
+    /**
+     * Check if order has been reviewed
+     */
+    public function hasReview(): bool
+    {
+        return $this->review !== null;
+    }
+
+    /**
      * Generate order number
      */
     public function getOrderNumberAttribute(): string
@@ -157,6 +184,14 @@ class Order extends Model
     public function scopeForUser($query, $userId)
     {
         return $query->where('user_id', $userId);
+    }
+
+    /**
+     * Scope for completed orders
+     */
+    public function scopeCompleted($query)
+    {
+        return $query->where('status', self::STATUS_COMPLETED);
     }
 
     /**

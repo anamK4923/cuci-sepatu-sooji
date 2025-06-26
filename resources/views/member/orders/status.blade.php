@@ -405,7 +405,7 @@
             });
 
             resetPaymentButton(button);
-            startAutoRefresh(); // Resume auto refresh
+            // startAutoRefresh(); // Resume auto refresh
         }
     }
 

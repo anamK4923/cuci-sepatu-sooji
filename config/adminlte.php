@@ -304,41 +304,12 @@ return [
 
     'menu' => [
         // Navbar items:
-        // [
-        //     'type' => 'navbar-search',
-        //     'text' => 'search',
-        //     'topnav_right' => false,
-        // ],
-        // [
-        //     'type' => 'darkmode-widget',
-        //     'topnav_right' => true,     // Or "topnav => true" to place on the left.
-        // ],
-        // [
-        //     'type' => 'navbar-notification',
-        //     'id' => 'my-notification',                // An ID attribute (required).
-        //     'icon' => 'fas fa-bell',                  // A font awesome icon (required).
-        //     'icon_color' => 'warning',                // The initial icon color (optional).
-        //     'label' => 0,                             // The initial label for the badge (optional).
-        //     'label_color' => 'danger',                // The initial badge color (optional).
-        //     'url' => 'notifications/show',            // The url to access all notifications/elements (required).
-        //     'topnav_right' => true,                   // Or "topnav => true" to place on the left (required).
-        //     'dropdown_mode' => true,                  // Enables the dropdown mode (optional).
-        //     'dropdown_flabel' => 'All notifications', // The label for the dropdown footer link (optional).
-        //     'update_cfg' => [
-        //         'url' => 'notifications/get',         // The url to periodically fetch new data (optional).
-        //         'period' => 30,                       // The update period for get new data (in seconds, optional).
-        //     ],
-        // ],
         [
             'type' => 'fullscreen-widget',
             'topnav_right' => false,
         ],
 
         // Sidebar items:
-        // [
-        //     'type' => 'sidebar-menu-search',
-        //     'text' => 'search',
-        // ],
         [
             'text' => 'Dashboard',
             'url' => 'dashboard',
@@ -346,111 +317,42 @@ return [
             'route' => 'dashboard.admin',
             'can' => 'admin-only',
         ],
-        // [
-        //     'text' => 'Dashboard',
-        //     'url' => 'dashboard-member',
-        //     'icon' => 'fas fa-tachometer-alt',
-        //     'route' => 'dashboard.member',
-        //     'can' => 'member-only',
-        // ],
         [
             'text' => 'Daftar Pelayanan',
             'url' => 'services-admin',
             'icon' => 'fab fa-servicestack',
-            // 'label' => 4,
-            // 'label_color' => 'success',
             'can' => 'admin-only',
         ],
         [
             'text' => 'Daftar Pemesanan',
             'url' => 'orders-admin',
-            'icon' => 'fab fa-servicestack',
-            // 'label' => 4,
-            // 'label_color' => 'success',
+            'icon' => 'fas fa-shopping-cart',
+            'can' => 'admin-only',
+        ],
+        [
+            'text' => 'Kelola Users',
+            'url' => 'admin/users',
+            'icon' => 'fas fa-users',
             'can' => 'admin-only',
         ],
         [
             'text' => 'Daftar Pelayanan',
             'url' => 'services-member',
             'icon' => 'fab fa-servicestack',
-            // 'label' => 4,
-            // 'label_color' => 'success',
             'can' => 'member-only',
         ],
         [
             'text' => 'Status Pemesanan',
             'url' => 'orders-member/status',
-            'icon' => 'fab fa-servicestack',
-            // 'label' => 4,
-            // 'label_color' => 'success',
+            'icon' => 'fas fa-list-alt',
             'can' => 'member-only',
         ],
-        // ['header' => 'account_settings'],
-        // [
-        //     'text' => 'profile',
-        //     'url' => 'admin/settings',
-        //     'icon' => 'fas fa-fw fa-user',
-        // ],
-        // [
-        //     'text' => 'change_password',
-        //     'url' => 'admin/settings',
-        //     'icon' => 'fas fa-fw fa-lock',
-        // ],
-        // [
-        //     'text' => 'multilevel',
-        //     'icon' => 'fas fa-fw fa-share',
-        //     'submenu' => [
-        //         [
-        //             'text' => 'level_one',
-        //             'url' => '#',
-        //         ],
-        //         [
-        //             'text' => 'level_one',
-        //             'url' => '#',
-        //             'submenu' => [
-        //                 [
-        //                     'text' => 'level_two',
-        //                     'url' => '#',
-        //                 ],
-        //                 [
-        //                     'text' => 'level_two',
-        //                     'url' => '#',
-        //                     'submenu' => [
-        //                         [
-        //                             'text' => 'level_three',
-        //                             'url' => '#',
-        //                         ],
-        //                         [
-        //                             'text' => 'level_three',
-        //                             'url' => '#',
-        //                         ],
-        //                     ],
-        //                 ],
-        //             ],
-        //         ],
-        //         [
-        //             'text' => 'level_one',
-        //             'url' => '#',
-        //         ],
-        //     ],
-        // ],
-        // ['header' => 'labels'],
-        // [
-        //     'text' => 'important',
-        //     'icon' => 'fas fa-fw fa-user',
-        //     'icon_color' => 'red',
-        //     'url' => '#',
-        // ],
-        // [
-        //     'text' => 'warning',
-        //     'icon_color' => 'yellow',
-        //     'url' => '#',
-        // ],
-        // [
-        //     'text' => 'information',
-        //     'icon_color' => 'cyan',
-        //     'url' => '#',
-        // ],
+        [
+            'text' => 'Riwayat Pemesanan',
+            'url' => 'member/history',
+            'icon' => 'fas fa-history',
+            'can' => 'member-only',
+        ],
     ],
 
     /*

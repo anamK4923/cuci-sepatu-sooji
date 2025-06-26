@@ -64,4 +64,20 @@ class User extends Authenticatable
     {
         return $this->profile_image;
     }
+
+    /**
+     * Get the user's average rating
+     */
+    public function getAverageRatingAttribute()
+    {
+        return $this->reviews()->avg('rating') ?? 0;
+    }
+
+    /**
+     * Get the user's total reviews count
+     */
+    public function getTotalReviewsAttribute()
+    {
+        return $this->reviews()->count();
+    }
 }

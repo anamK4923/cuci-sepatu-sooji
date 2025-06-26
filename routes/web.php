@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminOrderController;
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\OrderController;
@@ -30,6 +32,18 @@ Route::middleware(['admin'])->group(function () {
     Route::post('orders-admin/bulk-update', [AdminOrderController::class, 'bulkUpdate'])->name('admin.orders.bulk-update');
     Route::delete('orders-admin/{order}', [AdminOrderController::class, 'destroy'])->name('admin.orders.destroy');
     Route::get('orders-admin/export', [AdminOrderController::class, 'export'])->name('admin.orders.export');
+
+    // Admin User Management
+    Route::prefix('admin/users')->name('admin.users.')->group(function () {
+        Route::get('/', [AdminUserController::class, 'index'])->name('index');
+        Route::get('/create', [AdminUserController::class, 'create'])->name('create');
+        Route::post('/', [AdminUserController::class, 'store'])->name('store');
+        Route::get('/{user}', [AdminUserController::class, 'show'])->name('show');
+        Route::get('/{user}/edit', [AdminUserController::class, 'edit'])->name('edit');
+        Route::put('/{user}', [AdminUserController::class, 'update'])->name('update');
+        Route::delete('/{user}', [AdminUserController::class, 'destroy'])->name('destroy');
+        Route::get('/export', [AdminUserController::class, 'export'])->name('export');
+    });
 });
 
 Route::middleware(['member'])->group(function () {
@@ -47,8 +61,15 @@ Route::middleware(['member'])->group(function () {
     Route::get('/orders-member/{order}', [OrderController::class, 'show'])->name('member.orders.show');
     Route::patch('/orders-member/{order}/cancel', [OrderController::class, 'cancel'])->name('member.orders.cancel');
 
-    // Payment Routes
-    Route::prefix('payment')->name('member.payment.')->group(function () {
+    // Member History & Reviews
+    Route::prefix('member/history')->name('member.history.')->group(function () {
+        Route::get('/', [HistoryController::class, 'index'])->name('index');
+        Route::post('/{order}/review', [HistoryController::class, 'storeReview'])->name('store-review');
+        Route::put('/{order}/review', [HistoryController::class, 'updateReview'])->name('update-review');
+    });
+
+    // Payment Routes - pastikan middleware member ada
+    Route::middleware(['member'])->prefix('payment')->name('member.payment.')->group(function () {
         Route::post('/create/{order}', [PaymentController::class, 'createPayment'])->name('create');
         Route::get('/status/{order}', [PaymentController::class, 'checkStatus'])->name('status');
         Route::get('/finish', [PaymentController::class, 'finish'])->name('finish');
