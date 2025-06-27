@@ -109,7 +109,7 @@
                             <i class="fas fa-calendar-alt mr-1"></i>
                             Jadwal Penjemputan
                         </h6>
-                        <p class="mb-2">{{ $order->pickup_schedule->format('d M Y, H:i') }}</p>
+                        <p class="mb-2">{{ $order->pickup_schedule->format('d M Y, H:i') }} WIB</p>
                         @endif
                     </div>
 
@@ -451,9 +451,9 @@
         } catch (error) {
             console.error('Status check error:', error);
             Swal.fire({
-                title: 'Error',
-                text: 'Gagal mengecek status pembayaran. Silakan coba lagi.',
-                icon: 'error',
+                title: 'warning',
+                text: 'Pembayaran belum selesai. Silakan coba lagi nanti.',
+                icon: 'warning',
                 confirmButtonText: 'OK'
             });
         }

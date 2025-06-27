@@ -75,6 +75,126 @@ class AdminOrderController extends Controller
     }
 
     /**
+     * Get export data for PDF generation
+     */
+    public function getExportData(Request $request)
+    {
+        try {
+            // Build the same query as index method
+            $query = Order::with(['user', 'service']);
+
+            // Apply the same filters
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+
+            if ($request->filled('payment_status')) {
+                $query->where('payment_status', $request->payment_status);
+            }
+
+            if ($request->filled('delivery_method')) {
+                $query->where('delivery_method', $request->delivery_method);
+            }
+
+            if ($request->filled('date_from')) {
+                $query->whereDate('created_at', '>=', $request->date_from);
+            }
+
+            if ($request->filled('date_to')) {
+                $query->whereDate('created_at', '<=', $request->date_to);
+            }
+
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('id', 'like', "%{$search}%")
+                        ->orWhere('midtrans_order_id', 'like', "%{$search}%")
+                        ->orWhereHas('user', function ($userQuery) use ($search) {
+                            $userQuery->where('name', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('service', function ($serviceQuery) use ($search) {
+                            $serviceQuery->where('name', 'like', "%{$search}%");
+                        });
+                });
+            }
+
+            // Get all orders (not paginated for export)
+            $orders = $query->orderBy('created_at', 'desc')->get();
+
+            // Prepare status labels
+            $statusLabels = [
+                Order::STATUS_WAITING_PICKUP => 'Menunggu Penjemputan',
+                Order::STATUS_PICKED_UP => 'Sudah Dijemput',
+                Order::STATUS_IN_PROCESS => 'Sedang Diproses',
+                Order::STATUS_READY => 'Siap Diambil',
+                Order::STATUS_COMPLETED => 'Selesai',
+                Order::STATUS_CANCELLED => 'Dibatalkan',
+            ];
+
+            $paymentStatusLabels = [
+                Order::PAYMENT_PENDING => 'Menunggu Pembayaran',
+                Order::PAYMENT_PAID => 'Sudah Dibayar',
+                Order::PAYMENT_FAILED => 'Pembayaran Gagal',
+            ];
+
+            // Prepare export data
+            $exportData = [
+                'orders' => $orders->map(function ($order) use ($statusLabels, $paymentStatusLabels) {
+                    return [
+                        'id' => $order->id,
+                        'user' => [
+                            'name' => $order->user->name,
+                            'email' => $order->user->email,
+                        ],
+                        'service' => [
+                            'name' => $order->service->name,
+                            'price' => $order->service->price,
+                        ],
+                        'delivery_method' => $order->delivery_method,
+                        'delivery_method_label' => $order->delivery_method_label,
+                        'total_price' => $order->total_price,
+                        'status' => $order->status,
+                        'status_label' => $statusLabels[$order->status] ?? $order->status,
+                        'payment_status' => $order->payment_status,
+                        'payment_status_label' => $paymentStatusLabels[$order->payment_status] ?? $order->payment_status,
+                        'created_at' => $order->created_at->format('Y-m-d H:i:s'),
+                        'created_at_formatted' => $order->created_at->format('d/m/Y H:i'),
+                    ];
+                }),
+                'filters' => [
+                    'has_filters' => $request->hasAny(['status', 'payment_status', 'delivery_method', 'date_from', 'date_to', 'search']),
+                    'status' => $request->status,
+                    'status_label' => $request->status ? ($statusLabels[$request->status] ?? $request->status) : null,
+                    'payment_status' => $request->payment_status,
+                    'payment_status_label' => $request->payment_status ? ucfirst($request->payment_status) : null,
+                    'delivery_method' => $request->delivery_method,
+                    'delivery_method_label' => $request->delivery_method == 'antar_jemput' ? 'Antar Jemput' : ($request->delivery_method == 'drop_off' ? 'Drop Off' : null),
+                    'date_from' => $request->date_from,
+                    'date_to' => $request->date_to,
+                    'search' => $request->search,
+                ],
+                'summary' => [
+                    'total_orders' => $orders->count(),
+                    'total_revenue' => $orders->where('payment_status', Order::PAYMENT_PAID)->sum('total_price'),
+                    'export_date' => now()->format('Y-m-d'),
+                    'export_datetime' => now()->format('d/m/Y H:i:s'),
+                ]
+            ];
+
+            return response()->json([
+                'success' => true,
+                'data' => $exportData
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengambil data export: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Display the specified order
      */
     public function show(Order $order)
@@ -100,6 +220,14 @@ class AdminOrderController extends Controller
             ]),
             'notes' => 'nullable|string|max:500'
         ]);
+
+        // Check if trying to set status to 'done' but payment is not 'paid'
+        if ($request->status === Order::STATUS_COMPLETED && $order->payment_status !== Order::PAYMENT_PAID) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak dapat mengubah status menjadi selesai karena pembayaran belum lunas'
+            ], 400);
+        }
 
         try {
             $oldStatus = $order->status;
@@ -220,6 +348,8 @@ class AdminOrderController extends Controller
         return [
             'total_orders' => Order::count(),
             'today_orders' => Order::whereDate('created_at', $today)->count(),
+            'today_completed_orders' => Order::whereDate('created_at', $today)
+                ->where('status', Order::STATUS_COMPLETED)->count(),
             'pending_orders' => Order::where('status', '!=', Order::STATUS_COMPLETED)
                 ->where('status', '!=', Order::STATUS_CANCELLED)
                 ->count(),

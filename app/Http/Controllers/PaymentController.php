@@ -84,6 +84,11 @@ class PaymentController extends Controller
 
             $transaction = $this->midtransService->createTransaction($order);
 
+            // Update payment status setelah berhasil create transaction
+            $order->update([
+                'payment_status' => Order::PAYMENT_PAID
+            ]);
+
             Log::info('Payment transaction created successfully', [
                 'order_id' => $order->id,
                 'snap_token' => substr($transaction->token ?? '', 0, 10) . '...' // Log partial token for security

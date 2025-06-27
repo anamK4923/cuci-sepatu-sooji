@@ -12,7 +12,7 @@ class LandingController extends Controller
     {
         // Ambil review terbaik (rating 4-5) dengan limit untuk testimonials
         $reviews = Review::with(['user', 'order.service'])
-            ->where('rating', '>=', 4)
+            ->where('rating', '>=', 0)
             ->orderBy('rating', 'desc')
             ->orderBy('created_at', 'desc')
             ->limit(10)

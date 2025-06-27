@@ -22,33 +22,11 @@
     <div class="col-lg-3 col-6">
         <div class="small-box bg-success">
             <div class="inner">
-                <h3>{{ $stats['completed_orders'] }}</h3>
-                <p>Pesanan Selesai</p>
+                <h3>{{ $stats['today_completed_orders'] }}</h3>
+                <p>Pesanan Selesai Hari Ini</p>
             </div>
             <div class="icon">
                 <i class="fas fa-check-circle"></i>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-warning">
-            <div class="inner">
-                <h3>{{ $stats['pending_orders'] }}</h3>
-                <p>Pesanan Aktif</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-clock"></i>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-danger">
-            <div class="inner">
-                <h3>Rp{{ number_format($stats['total_revenue'], 0, ',', '.') }}</h3>
-                <p>Total Pendapatan</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-money-bill-wave"></i>
             </div>
         </div>
     </div>
@@ -152,8 +130,8 @@
                         Reset Filter
                     </a>
                     <button type="button" class="btn btn-info btn-sm ml-2" onclick="exportData()">
-                        <i class="fas fa-download mr-1"></i>
-                        Export
+                        <i class="fas fa-file-pdf mr-1"></i>
+                        Export PDF
                     </button>
                 </div>
             </div>
@@ -172,7 +150,7 @@
                                 <option value="update_payment_status">Update Status Pembayaran</option>
                                 <option value="delete">Hapus</option>
                             </select>
-                            <div class="input-group-append">
+                            <div class="input-group-append ml-2">
                                 <button type="submit" class="btn btn-warning">
                                     <i class="fas fa-play mr-1"></i>
                                     Jalankan
@@ -186,7 +164,7 @@
         </div>
 
         <!-- Orders Table -->
-        <div class="table-responsive">
+        <div class="table-responsive" id="exportTable">
             <table class="table table-bordered table-striped table-hover">
                 <thead class="thead-dark">
                     <tr>
@@ -329,6 +307,9 @@
 @stop
 
 @section('js')
+<!-- jsPDF CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <script>
     $(document).ready(function() {
         // Initialize tooltips
@@ -459,8 +440,15 @@
                             });
                         }
                     },
-                    error: function() {
-                        Swal.fire('Error', 'Gagal mengubah status', 'error');
+                    error: function(xhr) {
+                        let errorMessage = 'Gagal mengubah status';
+
+                        // Check if there's a specific error message from server
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+
+                        Swal.fire('Error', errorMessage, 'error');
                     }
                 });
             }
@@ -519,11 +507,193 @@
     }
 
     function exportData() {
+        // Show loading
         Swal.fire({
-            title: 'Export Data',
-            text: 'Fitur export akan segera tersedia!',
-            icon: 'info'
+            title: 'Memproses Export PDF...',
+            text: 'Mohon tunggu sebentar',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            willOpen: () => {
+                Swal.showLoading();
+            }
         });
+
+        // Get current filter parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const filterParams = {};
+
+        // Collect all filter parameters
+        ['status', 'payment_status', 'delivery_method', 'date_from', 'date_to', 'search'].forEach(param => {
+            if (urlParams.has(param)) {
+                filterParams[param] = urlParams.get(param);
+            }
+        });
+
+        // Fetch export data from controller
+        $.ajax({
+            url: '{{ route("admin.orders.export-data") }}',
+            method: 'GET',
+            data: filterParams,
+            success: function(response) {
+                if (response.success) {
+                    generatePDF(response.data);
+                } else {
+                    Swal.close();
+                    Swal.fire('Error', 'Gagal mengambil data export', 'error');
+                }
+            },
+            error: function(xhr) {
+                Swal.close();
+                Swal.fire('Error', 'Gagal mengambil data export: ' + (xhr.responseJSON?.message || 'Unknown error'), 'error');
+            }
+        });
+    }
+
+    function generatePDF(exportData) {
+        try {
+            const {
+                jsPDF
+            } = window.jspdf;
+            const pdf = new jsPDF('l', 'mm', 'a4'); // landscape orientation
+
+            // Set font
+            pdf.setFont('helvetica');
+
+            // Header
+            pdf.setFontSize(20);
+            pdf.setTextColor(40, 40, 40);
+            pdf.text('LAPORAN DATA PESANAN', pdf.internal.pageSize.getWidth() / 2, 20, {
+                align: 'center'
+            });
+
+            pdf.setFontSize(16);
+            pdf.text('CUCI SEPATU SOOOJI', pdf.internal.pageSize.getWidth() / 2, 30, {
+                align: 'center'
+            });
+
+            pdf.setFontSize(12);
+            pdf.text(`Tanggal Export: ${exportData.summary.export_date}`, pdf.internal.pageSize.getWidth() / 2, 40, {
+                align: 'center'
+            });
+
+            // Filter info if any
+            let yPosition = 50;
+
+            if (exportData.filters.has_filters) {
+                pdf.setFontSize(10);
+                pdf.text('Filter yang Diterapkan:', 20, yPosition);
+                yPosition += 7;
+
+                if (exportData.filters.status) {
+                    pdf.text(`• Status: ${exportData.filters.status_label}`, 25, yPosition);
+                    yPosition += 5;
+                }
+                if (exportData.filters.payment_status) {
+                    pdf.text(`• Status Pembayaran: ${exportData.filters.payment_status_label}`, 25, yPosition);
+                    yPosition += 5;
+                }
+                if (exportData.filters.delivery_method) {
+                    pdf.text(`• Metode Pengiriman: ${exportData.filters.delivery_method_label}`, 25, yPosition);
+                    yPosition += 5;
+                }
+                if (exportData.filters.date_from) {
+                    pdf.text(`• Dari Tanggal: ${exportData.filters.date_from}`, 25, yPosition);
+                    yPosition += 5;
+                }
+                if (exportData.filters.date_to) {
+                    pdf.text(`• Sampai Tanggal: ${exportData.filters.date_to}`, 25, yPosition);
+                    yPosition += 5;
+                }
+                if (exportData.filters.search) {
+                    pdf.text(`• Pencarian: "${exportData.filters.search}"`, 25, yPosition);
+                    yPosition += 5;
+                }
+                yPosition += 10;
+            } else {
+                yPosition += 10;
+            }
+
+            // Table headers
+            const headers = ['ID', 'Customer', 'Email', 'Layanan', 'Metode', 'Total', 'Status', 'Pembayaran', 'Tanggal'];
+            const colWidths = [10, 35, 45, 35, 25, 25, 20, 30, 30];
+            let xPosition = 20;
+
+            pdf.setFontSize(9);
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFillColor(60, 60, 60);
+
+            // Draw header background
+            pdf.rect(20, yPosition - 5, 255, 10, 'F');
+
+            // Draw headers
+            headers.forEach((header, index) => {
+                pdf.text(header, xPosition + 2, yPosition, {
+                    maxWidth: colWidths[index] - 4
+                });
+                xPosition += colWidths[index];
+            });
+
+            yPosition += 10;
+            pdf.setTextColor(40, 40, 40);
+
+            // Table data
+            exportData.orders.forEach((order, index) => {
+                if (yPosition > 180) { // New page if needed
+                    pdf.addPage();
+                    yPosition = 20;
+                }
+
+                xPosition = 20;
+
+                // Alternate row colors
+                if (index % 2 === 0) {
+                    pdf.setFillColor(248, 249, 250);
+                    pdf.rect(20, yPosition - 5, 255, 10, 'F');
+                }
+
+                const rowData = [
+                    `#${order.id}`,
+                    order.user.name.substring(0, 20) + (order.user.name.length > 20 ? '...' : ''),
+                    order.user.email.substring(0, 25) + (order.user.email.length > 25 ? '...' : ''),
+                    order.service.name.substring(0, 20) + (order.service.name.length > 20 ? '...' : ''),
+                    order.delivery_method_label,
+                    `Rp${new Intl.NumberFormat('id-ID').format(order.total_price)}`,
+                    order.status_label,
+                    order.payment_status_label,
+                    order.created_at_formatted
+                ];
+
+                rowData.forEach((data, colIndex) => {
+                    pdf.text(data, xPosition + 2, yPosition, {
+                        maxWidth: colWidths[colIndex] - 4
+                    });
+                    xPosition += colWidths[colIndex];
+                });
+
+                yPosition += 10;
+            });
+
+            // Footer
+            yPosition += 10;
+            pdf.setFontSize(10);
+            pdf.text(`Total Pesanan: ${exportData.summary.total_orders}`, 20, yPosition);
+            pdf.text(`Total Revenue: Rp${new Intl.NumberFormat('id-ID').format(exportData.summary.total_revenue)}`, 20, yPosition + 7);
+            pdf.text(`Dicetak pada: ${exportData.summary.export_datetime}`, 20, yPosition + 14);
+
+            // Generate filename
+            const fileName = `laporan-pesanan-${exportData.summary.export_date}.pdf`;
+
+            // Save the PDF
+            pdf.save(fileName);
+
+            Swal.close();
+            Swal.fire('Berhasil', 'PDF berhasil diunduh', 'success');
+
+        } catch (error) {
+            console.error('PDF generation error:', error);
+            Swal.close();
+            Swal.fire('Error', 'Gagal membuat PDF: ' + error.message, 'error');
+        }
     }
 </script>
 @stop

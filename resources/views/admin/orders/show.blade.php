@@ -309,12 +309,118 @@
 </div>
 
 <!-- Back Button -->
-<div class="row mt-3">
+<div class="row mt-3 pb-2">
     <div class="col-12">
         <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left mr-2"></i>
             Kembali ke Daftar Pesanan
         </a>
+    </div>
+</div>
+
+<!-- Hidden Invoice Template for Printing -->
+<div id="invoiceTemplate" style="display: none;">
+    <div class="invoice-container">
+        <!-- Invoice Header -->
+        <div class="invoice-header">
+            <div class="company-info">
+                <h1>CUCI SEPATU SOOOJI</h1>
+                <p>Jl. Contoh No. 123, Jakarta<br>
+                    Telp: (021) 1234-5678<br>
+                    Email: info@soooji.com</p>
+            </div>
+            <div class="invoice-info">
+                <h2>INVOICE</h2>
+                <p><strong>No. Invoice:</strong> INV-{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</p>
+                <p><strong>Tanggal:</strong> {{ $order->created_at->format('d M Y') }}</p>
+                <p><strong>Status:</strong> {{ $order->status_label }}</p>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- Customer Information -->
+        <div class="customer-info">
+            <h3>Informasi Pelanggan</h3>
+            <p><strong>Nama:</strong> {{ $order->user->name }}</p>
+            <p><strong>Email:</strong> {{ $order->user->email }}</p>
+            @if($order->user->no_hp)
+            <p><strong>Telepon:</strong> {{ $order->user->no_hp }}</p>
+            @endif
+        </div>
+
+        <hr>
+
+        <!-- Service Details -->
+        <div class="service-details">
+            <h3>Detail Layanan</h3>
+            <table class="invoice-table">
+                <thead>
+                    <tr>
+                        <th>Layanan</th>
+                        <th>Metode Pengiriman</th>
+                        <th>Harga</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ $order->service->name }}</td>
+                        <td>{{ $order->delivery_method_label }}</td>
+                        <td>Rp{{ number_format($order->total_price, 0, ',', '.') }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        @if($order->alamat_pickup || $order->pickup_schedule || $order->notes)
+        <hr>
+
+        <!-- Additional Information -->
+        <div class="additional-info">
+            <h3>Informasi Tambahan</h3>
+            @if($order->alamat_pickup)
+            <p><strong>Alamat Pickup:</strong> {{ $order->alamat_pickup }}</p>
+            @endif
+            @if($order->pickup_schedule)
+            <p><strong>Jadwal Pickup:</strong> {{ $order->pickup_schedule->format('d M Y, H:i') }}</p>
+            @endif
+            @if($order->notes)
+            <p><strong>Catatan:</strong> {{ $order->notes }}</p>
+            @endif
+        </div>
+        @endif
+
+        <hr>
+
+        <!-- Payment Information -->
+        <div class="payment-info">
+            <div class="payment-summary">
+                <table class="total-table">
+                    <tr>
+                        <td><strong>Total Pembayaran:</strong></td>
+                        <td><strong>Rp{{ number_format($order->total_price, 0, ',', '.') }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Status Pembayaran:</strong></td>
+                        <td><strong>{{ $order->payment_status_label }}</strong></td>
+                    </tr>
+                    @if($order->midtrans_order_id)
+                    <tr>
+                        <td><strong>ID Transaksi:</strong></td>
+                        <td>{{ $order->midtrans_order_id }}</td>
+                    </tr>
+                    @endif
+                </table>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- Footer -->
+        <div class="invoice-footer">
+            <p><em>Terima kasih atas kepercayaan Anda menggunakan layanan Cuci Sepatu Soooji!</em></p>
+            <p><small>Invoice ini dicetak pada: <span id="printTime"></span></small></p>
+        </div>
     </div>
 </div>
 
@@ -384,7 +490,145 @@
     }
 
     function printOrder() {
-        window.print();
+        // Get current time in Jakarta timezone using JavaScript
+        const now = new Date();
+        const jakartaTime = new Intl.DateTimeFormat('id-ID', {
+            timeZone: 'Asia/Jakarta',
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        }).format(now);
+
+        // Get the invoice template
+        var invoiceContent = document.getElementById('invoiceTemplate').innerHTML;
+
+        // Replace the print time placeholder with actual Jakarta time
+        invoiceContent = invoiceContent.replace(
+            '<span id="printTime"></span>',
+            `<span id="printTime">${jakartaTime}</span>`
+        );
+
+        // Create a new window for printing
+        var printWindow = window.open('', '_blank');
+
+        // Write the invoice content with proper styling
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Invoice - Order #{{ $order->id }}</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 0;
+                        padding: 20px;
+                        color: #333;
+                    }
+                    .invoice-container {
+                        max-width: 800px;
+                        margin: 0 auto;
+                    }
+                    .invoice-header {
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 30px;
+                    }
+                    .company-info h1 {
+                        color: #2c3e50;
+                        margin: 0 0 10px 0;
+                        font-size: 24px;
+                    }
+                    .company-info p {
+                        margin: 0;
+                        line-height: 1.5;
+                    }
+                    .invoice-info {
+                        text-align: right;
+                    }
+                    .invoice-info h2 {
+                        color: #e74c3c;
+                        margin: 0 0 10px 0;
+                        font-size: 28px;
+                    }
+                    .invoice-info p {
+                        margin: 5px 0;
+                    }
+                    hr {
+                        border: none;
+                        border-top: 2px solid #ecf0f1;
+                        margin: 20px 0;
+                    }
+                    h3 {
+                        color: #2c3e50;
+                        border-bottom: 1px solid #bdc3c7;
+                        padding-bottom: 5px;
+                        margin-bottom: 15px;
+                    }
+                    .customer-info p, .additional-info p {
+                        margin: 8px 0;
+                    }
+                    .invoice-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin: 15px 0;
+                    }
+                    .invoice-table th, .invoice-table td {
+                        border: 1px solid #bdc3c7;
+                        padding: 12px;
+                        text-align: left;
+                    }
+                    .invoice-table th {
+                        background-color: #ecf0f1;
+                        font-weight: bold;
+                    }
+                    .total-table {
+                        width: 100%;
+                        margin-top: 20px;
+                    }
+                    .total-table td {
+                        padding: 8px;
+                        border: none;
+                    }
+                    .total-table td:last-child {
+                        text-align: right;
+                        width: 200px;
+                    }
+                    .payment-summary {
+                        background-color: #f8f9fa;
+                        padding: 20px;
+                        border-radius: 5px;
+                    }
+                    .invoice-footer {
+                        text-align: center;
+                        margin-top: 30px;
+                        padding-top: 20px;
+                        border-top: 1px solid #bdc3c7;
+                    }
+                    .invoice-footer p {
+                        margin: 10px 0;
+                    }
+                    @media print {
+                        body { margin: 0; }
+                        .invoice-container { max-width: none; }
+                    }
+                </style>
+            </head>
+            <body>
+                ${invoiceContent}
+            </body>
+            </html>
+        `);
+
+        printWindow.document.close();
+
+        // Wait for content to load then print
+        printWindow.onload = function() {
+            printWindow.print();
+            printWindow.close();
+        };
     }
 
     function sendNotification() {

@@ -124,6 +124,12 @@ class OrderController extends Controller
     {
         $orders = Order::with(['service'])
             ->forUser(Auth::id())
+            ->whereIn('status', [
+                Order::STATUS_WAITING_PICKUP,
+                Order::STATUS_PICKED_UP,
+                Order::STATUS_IN_PROCESS,
+                Order::STATUS_READY
+            ])
             ->orderBy('created_at', 'desc')
             ->get();
 

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\LandingController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\Admin\ReportController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +35,20 @@ Route::middleware(['admin'])->group(function () {
     Route::delete('orders-admin/{order}', [AdminOrderController::class, 'destroy'])->name('admin.orders.destroy');
     Route::get('orders-admin/export', [AdminOrderController::class, 'export'])->name('admin.orders.export');
 
+    // New route for export data
+    Route::get('api/admin/orders/export-data', [AdminOrderController::class, 'getExportData'])->name('admin.orders.export-data');
+
+    // Reports Management
+    Route::prefix('admin/reports')->name('admin.reports.')->group(function () {
+        Route::get('/', [ReportController::class, 'index'])->name('index');
+        Route::get('/pdf', [ReportController::class, 'exportPDF'])->name('pdf');
+        Route::get('/export', [ReportController::class, 'exportReport'])->name('export');
+        Route::get('/analytics', [ReportController::class, 'analytics'])->name('analytics');
+        Route::get('/revenue', [ReportController::class, 'revenueReport'])->name('revenue');
+        Route::get('/customers', [ReportController::class, 'customerReport'])->name('customers');
+        Route::get('/services', [ReportController::class, 'serviceReport'])->name('services');
+    });
+
     // Admin User Management
     Route::prefix('admin/users')->name('admin.users.')->group(function () {
         Route::get('/', [AdminUserController::class, 'index'])->name('index');
@@ -43,6 +59,16 @@ Route::middleware(['admin'])->group(function () {
         Route::put('/{user}', [AdminUserController::class, 'update'])->name('update');
         Route::delete('/{user}', [AdminUserController::class, 'destroy'])->name('destroy');
         Route::get('/export', [AdminUserController::class, 'export'])->name('export');
+    });
+
+    // Admin Review Management
+    Route::prefix('admin/reviews')->name('admin.reviews.')->group(function () {
+        Route::get('/', [AdminReviewController::class, 'index'])->name('index');
+        Route::get('/{review}', [AdminReviewController::class, 'show'])->name('show');
+        Route::delete('/{review}', [AdminReviewController::class, 'destroy'])->name('destroy');
+        Route::post('/bulk-destroy', [AdminReviewController::class, 'bulkDestroy'])->name('bulk-destroy');
+        Route::get('/export', [AdminReviewController::class, 'export'])->name('export');
+        Route::get('/chart-data', [AdminReviewController::class, 'getChartData'])->name('chart-data');
     });
 });
 
@@ -101,6 +127,7 @@ Route::middleware(['auth'])->prefix('api')->group(function () {
     // Admin API
     Route::middleware(['admin'])->prefix('admin')->name('api.admin.')->group(function () {
         Route::get('/orders/stats', [AdminOrderController::class, 'getStats'])->name('orders.stats');
+        Route::get('/reviews/chart-data', [AdminReviewController::class, 'getChartData'])->name('reviews.chart-data');
     });
 });
 

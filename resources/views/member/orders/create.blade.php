@@ -7,7 +7,7 @@
 @section('content_body')
 
 <div class="row justify-content-center">
-    <div class="col-md-8">
+    <div class="col-md-12">
         <!-- Service Info Card -->
         <div class="card card-primary mb-4">
             <div class="card-header">

@@ -61,17 +61,23 @@
         }
 
         .default-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
+            width: 56px;
+            height: 56px;
+            background-color: #dee2e6;
+            color: #495057;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
             font-weight: bold;
+            font-size: 1.2rem;
         }
+
+        .testimonial-item {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
 
         .service-badge {
             background: #667eea;
@@ -153,7 +159,7 @@
         </section><!-- /Hero Section -->
 
         <!-- Review Statistics Section -->
-        @if($reviews->count() > 0)
+        <!-- @if($reviews->count() > 0)
         <section class="review-stats">
             <div class="container">
                 <div class="row">
@@ -176,7 +182,7 @@
                 </div>
             </div>
         </section>
-        @endif
+        @endif -->
 
         <!-- About Section -->
         <section id="about" class="about section light-background">
@@ -466,9 +472,6 @@
                     </div>
 
                     <div class="col-lg-7" data-aos="fade-up" data-aos-delay="200">
-
-                        @if($reviews->count() > 0)
-                        <!-- Dynamic Reviews from Database -->
                         <div class="swiper init-swiper">
                             <script type="application/json" class="swiper-config">
                                 {
@@ -485,137 +488,49 @@
                                     }
                                 }
                             </script>
-                            <div class="swiper-wrapper">
 
-                                @foreach($reviews as $review)
+                            <div class="swiper-wrapper">
+                                @forelse($reviews as $review)
                                 <div class="swiper-slide">
                                     <div class="testimonial-item">
-                                        <div class="d-flex">
+                                        <div class="d-flex align-items-start mb-3">
                                             @if($review->user->profile_photo)
                                             <img src="{{ asset('storage/' . $review->user->profile_photo) }}"
-                                                class="testimonial-img flex-shrink-0"
+                                                class="testimonial-img flex-shrink-0 me-3 rounded-circle"
                                                 alt="{{ $review->user->name }}">
                                             @else
-                                            <div class="default-avatar flex-shrink-0">
+                                            <div class="default-avatar rounded-circle me-3">
                                                 {{ strtoupper(substr($review->user->name, 0, 1)) }}
                                             </div>
                                             @endif
                                             <div>
-                                                <h3>{{ $review->user->name }}</h3>
-                                                <h4>Pelanggan {{ $review->order->service->name }}</h4>
-                                                <div class="stars">
+                                                <h5 class="mb-1">{{ $review->user->name }}</h5>
+                                                <small class="text-muted">Pelanggan {{ $review->order->service->name }}</small>
+                                                <div class="stars my-1">
                                                     @for($i = 1; $i <= 5; $i++)
-                                                        @if($i <=$review->rating)
-                                                        <i class="bi bi-star-fill"></i>
-                                                        @else
-                                                        <i class="bi bi-star"></i>
-                                                        @endif
+                                                        <i class="bi {{ $i <= $review->rating ? 'bi-star-fill text-warning' : 'bi-star text-muted' }}"></i>
                                                         @endfor
                                                 </div>
-                                                <div class="service-badge">{{ $review->order->service->name }}</div>
-                                                <div class="review-date">{{ $review->created_at->diffForHumans() }}</div>
+                                                <div class="review-date text-muted small">{{ $review->created_at->diffForHumans() }}</div>
                                             </div>
                                         </div>
-                                        <p>
+                                        <p class="fst-italic text-dark">
                                             <i class="bi bi-quote quote-icon-left"></i>
-                                            <span>{{ Str::limit($review->comment, 150) }}</span>
+                                            {{ Str::limit($review->comment, 150) }}
                                             <i class="bi bi-quote quote-icon-right"></i>
                                         </p>
                                     </div>
                                 </div>
-                                @endforeach
-
+                                @empty
+                                {{-- Static fallback slides --}}
+                                @include('partials.static-testimonials')
+                                @endforelse
                             </div>
 
-                            <div class="swiper-pagination"></div>
+                            <div class="swiper-pagination mt-3"></div>
                         </div>
-                        @else
-                        <!-- Fallback Static Reviews -->
-                        <div class="swiper init-swiper">
-                            <script type="application/json" class="swiper-config">
-                                {
-                                    "loop": true,
-                                    "speed": 600,
-                                    "autoplay": {
-                                        "delay": 5000
-                                    },
-                                    "slidesPerView": "auto",
-                                    "pagination": {
-                                        "el": ".swiper-pagination",
-                                        "type": "bullets",
-                                        "clickable": true
-                                    }
-                                }
-                            </script>
-                            <div class="swiper-wrapper">
-
-                                <div class="swiper-slide">
-                                    <div class="testimonial-item">
-                                        <div class="d-flex">
-                                            <img src="welcome/assets/img/testimonials/testimonials-1.jpg" class="testimonial-img flex-shrink-0" alt="">
-                                            <div>
-                                                <h3>Ardiansyah Putra</h3>
-                                                <h4>Pelanggan Tetap</h4>
-                                                <div class="stars">
-                                                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <p>
-                                            <i class="bi bi-quote quote-icon-left"></i>
-                                            <span>Sepatu saya yang awalnya kotor banget sekarang jadi kayak baru lagi! Wangi, bersih, dan pelayanannya cepat. Soooji emang solusi terbaik buat sepatu kesayangan.</span>
-                                            <i class="bi bi-quote quote-icon-right"></i>
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div class="swiper-slide">
-                                    <div class="testimonial-item">
-                                        <div class="d-flex">
-                                            <img src="welcome/assets/img/testimonials/testimonials-2.jpg" class="testimonial-img flex-shrink-0" alt="">
-                                            <div>
-                                                <h3>Sinta Maharani</h3>
-                                                <h4>Karyawan Kantor</h4>
-                                                <div class="stars">
-                                                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <p>
-                                            <i class="bi bi-quote quote-icon-left"></i>
-                                            <span>Selalu puas cuci sepatu di Soooji. Sepatu sneakers putihku jadi cling kayak baru beli, harganya juga ramah di kantong. Pokoknya recommended!</span>
-                                            <i class="bi bi-quote quote-icon-right"></i>
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div class="swiper-slide">
-                                    <div class="testimonial-item">
-                                        <div class="d-flex">
-                                            <img src="welcome/assets/img/testimonials/testimonials-3.jpg" class="testimonial-img flex-shrink-0" alt="">
-                                            <div>
-                                                <h3>Rizky Ramadhan</h3>
-                                                <h4>Mahasiswa</h4>
-                                                <div class="stars">
-                                                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <p>
-                                            <i class="bi bi-quote quote-icon-left"></i>
-                                            <span>Awalnya coba-coba, ternyata hasilnya di luar ekspektasi! Sepatu bolaku yang kotor parah jadi mulus lagi. Soooji emang the best.</span>
-                                            <i class="bi bi-quote quote-icon-right"></i>
-                                        </p>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <div class="swiper-pagination"></div>
-                        </div>
-                        @endif
-
                     </div>
+
 
                 </div>
 
