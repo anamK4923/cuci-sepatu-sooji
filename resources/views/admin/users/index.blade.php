@@ -135,7 +135,10 @@
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div class="user-avatar mr-2">
-                                            <i class="fas fa-user-circle fa-2x text-{{ $user->role == 'admin' ? 'primary' : 'success' }}"></i>
+                                            <img src="{{ $user->image ? asset('storage/profile/' . $user->image) : asset('images/ame.jpg') }}"
+                                                alt="User Image"
+                                                class="img-circle"
+                                                style="width: 40px; height: 40px; object-fit: cover;">
                                         </div>
                                         <div>
                                             <strong>{{ $user->name }}</strong>

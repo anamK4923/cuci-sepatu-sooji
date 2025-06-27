@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class AdminUserController extends Controller
@@ -65,14 +66,24 @@ class AdminUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'image' => 'nullable|image|mimes:jpg,png,gif|max:2048',
             'role' => 'required|in:admin',
             'no_hp' => 'nullable|string|max:20',
         ]);
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            // Store new image
+            $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
+            $request->file('image')->storeAs('profile', $imageName, 'public');
+            $validated['image'] = $imageName;
+        }
 
         User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'image' => isset($imageName) ? $imageName : null,
             'role' => $request->role,
             'no_hp' => $request->no_hp,
         ]);
@@ -109,19 +120,34 @@ class AdminUserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'password' => 'nullable|string|min:8|confirmed',
+            // 'password' => 'nullable|string|min:8|confirmed',
+            'image' => 'nullable|image|mimes:jpg,png,gif|max:2048',
             'no_hp' => 'nullable|string|max:20',
         ]);
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($user->image && Storage::disk('public')->exists('profile/' . $user->image)) {
+                Storage::disk('public')->delete('profile/' . $user->image);
+            }
+
+            // Store new image
+            $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
+            $request->file('image')->storeAs('profile', $imageName, 'public');
+            $validated['image'] = $imageName;
+        }
 
         $data = [
             'name' => $request->name,
             'email' => $request->email,
+            'image' => isset($imageName) ? $imageName : $user->image,
             'no_hp' => $request->no_hp,
         ];
 
-        if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->password);
-        }
+        // if ($request->filled('password')) {
+        //     $data['password'] = Hash::make($request->password);
+        // }
 
         $user->update($data);
 

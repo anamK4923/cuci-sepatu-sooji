@@ -16,9 +16,39 @@
                 </h3>
             </div>
 
-            <form action="{{ route('admin.users.update', $user) }}" method="POST">
+            <form action="{{ route('admin.users.update', $user) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
+
+                <!-- Profile Image -->
+                <div class="form-group" style="margin: 5px 20px 0px 20px;">
+                    <label for="image">
+                        <i class="fas fa-image text-info mr-1"></i>
+                        Foto Profil
+                    </label>
+                    <div class="text-center mb-3">
+                        <img id="profile-preview"
+                            src="{{ $user->image ? asset('storage/profile/' . $user->image) : asset('images/ame.jpg') }}"
+                            alt="Profile Image"
+                            class="img-circle elevation-2"
+                            style="width: 100px; height: 100px; object-fit: cover;">
+                    </div>
+                    <div class="custom-file">
+                        <input type="file"
+                            class="custom-file-input @error('image') is-invalid @enderror"
+                            id="image"
+                            name="image"
+                            accept="image/*"
+                            onchange="previewImage(this)">
+                        <label class="custom-file-label" for="image">Pilih foto...</label>
+                        @error('image')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <small class="form-text text-muted">
+                        Format: JPG, PNG, GIF. Maksimal 2MB.
+                    </small>
+                </div>
 
                 <div class="card-body">
                     <!-- Name -->
@@ -100,7 +130,7 @@
                     </div>
 
                     <!-- Password (Optional) -->
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <label for="password">
                             <i class="fas fa-lock text-danger mr-1"></i>
                             Password Baru
@@ -129,10 +159,10 @@
                             <i class="fas fa-info-circle mr-1"></i>
                             Minimal 8 karakter. Kosongkan jika tidak ingin mengubah password.
                         </small>
-                    </div>
+                    </div> -->
 
                     <!-- Confirm Password -->
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <label for="password_confirmation">
                             <i class="fas fa-lock text-danger mr-1"></i>
                             Konfirmasi Password Baru
@@ -154,7 +184,7 @@
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
 
                 <!-- Card Footer -->
@@ -260,6 +290,26 @@
     // Reset form changed flag on submit
     document.querySelector('form').addEventListener('submit', function() {
         formChanged = false;
+    });
+
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('profile-preview').src = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+
+            // Update label nama file
+            var fileName = input.files[0].name;
+            input.nextElementSibling.innerHTML = fileName;
+        }
+    }
+
+    // Custom file input label update (biar aman kalau lewat file manager)
+    $('.custom-file-input').on('change', function() {
+        let fileName = $(this).val().split('\\').pop();
+        $(this).next('.custom-file-label').addClass("selected").html(fileName);
     });
 </script>
 @stop

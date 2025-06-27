@@ -19,11 +19,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'image', // Ganti 'foto' dengan 'image' jika kamu pakai nama ini di database
+        'dark_mode',
         'role',
-        'nisn',
         'no_hp',
-        'asal_sekolah',
-        'alamat',
     ];
 
     /**
@@ -52,9 +51,9 @@ class User extends Authenticatable
 
     public function getProfileImageAttribute()
     {
-        // Kalau kamu pakai column foto di table users
-        if ($this->foto) {
-            return asset('storage/profile/' . $this->foto);
+        // Kalau kamu pakai column image di table users
+        if ($this->image) {
+            return asset('storage/profile/' . $this->image);
         }
         // default avatar
         return asset('images/ame.jpg');
@@ -64,6 +63,12 @@ class User extends Authenticatable
     {
         return $this->profile_image;
     }
+
+    public function adminlte_profile_url()
+    {
+        return route('profile.edit'); // atau sesuai route profile kamu
+    }
+
 
     /**
      * Get the user's average rating
