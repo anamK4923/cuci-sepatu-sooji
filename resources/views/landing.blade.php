@@ -288,8 +288,8 @@
                         <div class="service-item d-flex">
                             <div class="icon flex-shrink-0"><i class="bi bi-binoculars"></i></div>
                             <div>
-                                <h4 class="title"><a href="services-details.html" class="stretched-link">Repair Sepatu</a></h4>
-                                <p class="description">Perbaikan sepatu robek, sol lepas, atau kerusakan ringan lainnya.</p>
+                                <h4 class="title"><a href="services-details.html" class="stretched-link">Unyellowing</a></h4>
+                                <p class="description">Mengembalikan warna putih sepatu jadi kinclong seperti baru lagi.</p>
                             </div>
                         </div>
                     </div><!-- End Service Item -->
@@ -493,16 +493,12 @@
                                 @forelse($reviews as $review)
                                 <div class="swiper-slide">
                                     <div class="testimonial-item">
-                                        <div class="d-flex align-items-start mb-3">
-                                            @if($review->user->profile_photo)
-                                            <img src="{{ asset('storage/' . $review->user->profile_photo) }}"
-                                                class="testimonial-img flex-shrink-0 me-3 rounded-circle"
-                                                alt="{{ $review->user->name }}">
-                                            @else
-                                            <div class="default-avatar rounded-circle me-3">
-                                                {{ strtoupper(substr($review->user->name, 0, 1)) }}
-                                            </div>
-                                            @endif
+                                        <div class="d-flex align-items-start mb-3 gap-3">
+                                            <img id="profile-preview"
+                                                src="{{ $review->user->profile_image }}"
+                                                alt="Profile Image"
+                                                class="img-circle elevation-2"
+                                                style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
                                             <div>
                                                 <h5 class="mb-1">{{ $review->user->name }}</h5>
                                                 <small class="text-muted">Pelanggan {{ $review->order->service->name }}</small>

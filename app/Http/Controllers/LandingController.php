@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Review;
 use App\Models\Service;
+use App\Models\User;
 use Illuminate\View\View;
 
 class LandingController extends Controller
@@ -18,6 +19,19 @@ class LandingController extends Controller
             ->limit(10)
             ->get();
 
+        // Ambil 10 review rating tertinggi
+        $reviews = Review::with(['user', 'order.service'])
+            ->where('rating', '>=', 0)
+            ->orderBy('rating', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Ambil user yang user_id-nya ada di review yang tadi diambil
+        $userIds = $reviews->pluck('user_id')->unique();
+
+        $users = User::whereIn('id', $userIds)->get();
+
         // Hitung statistik review untuk ditampilkan
         $reviewStats = [
             'total_reviews' => Review::count(),
@@ -30,6 +44,6 @@ class LandingController extends Controller
         // Ambil layanan untuk ditampilkan
         $services = Service::orderBy('name')->get();
 
-        return view('landing', compact('reviews', 'reviewStats', 'services'));
+        return view('landing', compact('reviews', 'reviewStats', 'services', 'users'));
     }
 }
