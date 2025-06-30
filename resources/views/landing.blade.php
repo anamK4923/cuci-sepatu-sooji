@@ -518,8 +518,85 @@
                                     </div>
                                 </div>
                                 @empty
-                                {{-- Static fallback slides --}}
-                                @include('partials.static-testimonials')
+                                {{-- Static fallback slides when no reviews exist --}}
+                                <div class="swiper-slide">
+                                    <div class="testimonial-item">
+                                        <div class="d-flex align-items-start mb-3 gap-3">
+                                            <img src="{{ asset('images/default-avatar.png') }}"
+                                                alt="Default Avatar"
+                                                class="img-circle elevation-2"
+                                                style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
+                                            <div>
+                                                <h5 class="mb-1">John Doe</h5>
+                                                <small class="text-muted">Pelanggan Setia</small>
+                                                <div class="stars my-1">
+                                                    @for($i = 1; $i <= 5; $i++)
+                                                        <i class="bi bi-star-fill text-warning"></i>
+                                                        @endfor
+                                                </div>
+                                                <div class="review-date text-muted small">2 hari yang lalu</div>
+                                            </div>
+                                        </div>
+                                        <p class="fst-italic text-dark">
+                                            <i class="bi bi-quote quote-icon-left"></i>
+                                            Pelayanan yang sangat memuaskan! Tim profesional dan hasil kerja berkualitas tinggi.
+                                            <i class="bi bi-quote quote-icon-right"></i>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="swiper-slide">
+                                    <div class="testimonial-item">
+                                        <div class="d-flex align-items-start mb-3 gap-3">
+                                            <img src="{{ asset('images/default-avatar.png') }}"
+                                                alt="Default Avatar"
+                                                class="img-circle elevation-2"
+                                                style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
+                                            <div>
+                                                <h5 class="mb-1">Jane Smith</h5>
+                                                <small class="text-muted">Pelanggan Premium</small>
+                                                <div class="stars my-1">
+                                                    @for($i = 1; $i <= 5; $i++)
+                                                        <i class="bi bi-star-fill text-warning"></i>
+                                                        @endfor
+                                                </div>
+                                                <div class="review-date text-muted small">1 minggu yang lalu</div>
+                                            </div>
+                                        </div>
+                                        <p class="fst-italic text-dark">
+                                            <i class="bi bi-quote quote-icon-left"></i>
+                                            Sangat puas dengan layanan yang diberikan. Proses cepat dan hasil sesuai ekspektasi.
+                                            <i class="bi bi-quote quote-icon-right"></i>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="swiper-slide">
+                                    <div class="testimonial-item">
+                                        <div class="d-flex align-items-start mb-3 gap-3">
+                                            <img src="{{ asset('images/default-avatar.png') }}"
+                                                alt="Default Avatar"
+                                                class="img-circle elevation-2"
+                                                style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
+                                            <div>
+                                                <h5 class="mb-1">Ahmad Rahman</h5>
+                                                <small class="text-muted">Pelanggan Reguler</small>
+                                                <div class="stars my-1">
+                                                    @for($i = 1; $i <= 4; $i++)
+                                                        <i class="bi bi-star-fill text-warning"></i>
+                                                        @endfor
+                                                        <i class="bi bi-star text-muted"></i>
+                                                </div>
+                                                <div class="review-date text-muted small">2 minggu yang lalu</div>
+                                            </div>
+                                        </div>
+                                        <p class="fst-italic text-dark">
+                                            <i class="bi bi-quote quote-icon-left"></i>
+                                            Layanan bagus dan tim yang responsif. Akan menggunakan jasa ini lagi di masa depan.
+                                            <i class="bi bi-quote quote-icon-right"></i>
+                                        </p>
+                                    </div>
+                                </div>
                                 @endforelse
                             </div>
 

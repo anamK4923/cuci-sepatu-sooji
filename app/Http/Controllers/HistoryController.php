@@ -59,11 +59,16 @@ class HistoryController extends Controller
     {
         // Ensure user can only review their own completed orders
         if ($order->user_id !== Auth::id()) {
-            return response()->json(['error' => 'Tidak diizinkan'], 403);
+            return response()->json(['success' => false, 'message' => 'Tidak diizinkan'], 403);
         }
 
         if (!$order->canBeReviewed()) {
-            return response()->json(['error' => 'Pesanan tidak dapat direview'], 400);
+            return response()->json(['success' => false, 'message' => 'Pesanan tidak dapat direview'], 400);
+        }
+
+        // Check if review already exists
+        if ($order->review) {
+            return response()->json(['success' => false, 'message' => 'Review sudah ada untuk pesanan ini'], 400);
         }
 
         $request->validate([
@@ -87,6 +92,7 @@ class HistoryController extends Controller
                 'success' => true,
                 'message' => 'Review berhasil disimpan!',
                 'review' => [
+                    'id' => $review->id,
                     'rating' => $review->rating,
                     'rating_text' => $review->rating_text,
                     'rating_stars' => $review->rating_stars,
@@ -96,7 +102,6 @@ class HistoryController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal menyimpan review: ' . $e->getMessage()
@@ -111,12 +116,12 @@ class HistoryController extends Controller
     {
         // Ensure user can only update their own reviews
         if ($order->user_id !== Auth::id()) {
-            return response()->json(['error' => 'Tidak diizinkan'], 403);
+            return response()->json(['success' => false, 'message' => 'Tidak diizinkan'], 403);
         }
 
         $review = $order->review;
         if (!$review) {
-            return response()->json(['error' => 'Review tidak ditemukan'], 404);
+            return response()->json(['success' => false, 'message' => 'Review tidak ditemukan'], 404);
         }
 
         $request->validate([
@@ -125,15 +130,20 @@ class HistoryController extends Controller
         ]);
 
         try {
+            DB::beginTransaction();
+
             $review->update([
                 'rating' => $request->rating,
                 'comment' => $request->comment,
             ]);
 
+            DB::commit();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Review berhasil diupdate!',
                 'review' => [
+                    'id' => $review->id,
                     'rating' => $review->rating,
                     'rating_text' => $review->rating_text,
                     'rating_stars' => $review->rating_stars,
@@ -142,11 +152,36 @@ class HistoryController extends Controller
                 ]
             ]);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal mengupdate review: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Get review data for editing
+     */
+    public function getReview(Order $order)
+    {
+        if ($order->user_id !== Auth::id()) {
+            return response()->json(['success' => false, 'message' => 'Tidak diizinkan'], 403);
+        }
+
+        $review = $order->review;
+        if (!$review) {
+            return response()->json(['success' => false, 'message' => 'Review tidak ditemukan'], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'review' => [
+                'id' => $review->id,
+                'rating' => $review->rating,
+                'comment' => $review->comment,
+            ]
+        ]);
     }
 
     /**

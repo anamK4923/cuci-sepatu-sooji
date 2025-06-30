@@ -5,7 +5,6 @@
 @section('content_header_subtitle', 'Transaksi yang Telah Selesai')
 
 @section('content_body')
-
 <div class="row">
     <div class="col-12">
         <!-- Statistics Cards -->
@@ -139,7 +138,6 @@
                                         Selesai
                                     </span>
                                 </div>
-
                                 <div class="row">
                                     <div class="col-md-6">
                                         <p class="text-muted mb-1">
@@ -162,7 +160,6 @@
                                         </p>
                                     </div>
                                 </div>
-
                                 @if($order->notes)
                                 <p class="text-muted mb-2">
                                     <i class="fas fa-sticky-note mr-1"></i>
@@ -194,6 +191,11 @@
                                                 <i class="fas fa-edit mr-1"></i>
                                                 Edit Review
                                             </button>
+                                        </div>
+                                        <!-- Hidden data for JavaScript -->
+                                        <div class="d-none review-data"
+                                            data-rating="{{ $order->review->rating }}"
+                                            data-comment="{{ $order->review->comment }}">
                                         </div>
                                     </div>
                                     @else
@@ -311,13 +313,11 @@
         </div>
     </div>
 </div>
-
 @stop
 
 @section('js')
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
     // Rating text mapping
     const ratingTexts = {
@@ -342,13 +342,19 @@
         $('#reviewModal').modal('show');
     }
 
-    // Edit existing review
+    // Edit existing review - FIXED VERSION
     function editReview(orderId) {
-        // Get existing review data from the display
+        // Get existing review data from hidden data attributes
         const reviewDisplay = document.getElementById(`review-display-${orderId}`);
-        const ratingStars = reviewDisplay.querySelectorAll('.fas.fa-star').length;
-        const commentElement = reviewDisplay.querySelector('.review-comment');
-        const comment = commentElement ? commentElement.textContent : '';
+        const reviewData = reviewDisplay.querySelector('.review-data');
+
+        if (!reviewData) {
+            console.error('Review data not found');
+            return;
+        }
+
+        const rating = reviewData.getAttribute('data-rating');
+        const comment = reviewData.getAttribute('data-comment') || '';
 
         // Set form data
         document.getElementById('order_id').value = orderId;
@@ -357,8 +363,11 @@
         document.getElementById('submit-text').textContent = 'Update Review';
 
         // Set rating
-        document.querySelector(`input[name="rating"][value="${ratingStars}"]`).checked = true;
-        document.getElementById('rating-text').textContent = ratingTexts[ratingStars];
+        const ratingInput = document.querySelector(`input[name="rating"][value="${rating}"]`);
+        if (ratingInput) {
+            ratingInput.checked = true;
+            document.getElementById('rating-text').textContent = ratingTexts[rating];
+        }
 
         // Set comment
         document.getElementById('comment').value = comment;
@@ -374,7 +383,7 @@
         });
     });
 
-    // Handle form submission
+    // Handle form submission - IMPROVED VERSION
     document.getElementById('reviewForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -406,19 +415,26 @@
         // Prepare request data
         const requestData = {
             rating: rating,
-            comment: formData.get('comment'),
+            comment: formData.get('comment') || '',
             _token: '{{ csrf_token() }}'
         };
 
-        // Send request
-        const url = isEdit ? `/member/history/${orderId}/review` : `/member/history/${orderId}/review`;
+        // Determine URL and method
+        const url = `/member/history/${orderId}/review`;
         const method = isEdit ? 'PUT' : 'POST';
 
+        // Add method override for PUT requests
+        if (isEdit) {
+            requestData._method = 'PUT';
+        }
+
+        // Send request
         fetch(url, {
-                method: method,
+                method: 'POST', // Always use POST, Laravel will handle method override
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
                 body: JSON.stringify(requestData)
             })
@@ -432,7 +448,7 @@
                         confirmButtonText: 'OK'
                     }).then(() => {
                         $('#reviewModal').modal('hide');
-                        updateReviewDisplay(orderId, data.review);
+                        updateReviewDisplay(orderId, data.review, isEdit);
                     });
                 } else {
                     Swal.fire({
@@ -454,52 +470,46 @@
             });
     });
 
-    // Update review display after successful submission
-    function updateReviewDisplay(orderId, reviewData) {
-        const noReviewElement = document.getElementById(`no-review-${orderId}`);
-        const reviewDisplayElement = document.getElementById(`review-display-${orderId}`);
+    // Update review display after successful submission - IMPROVED VERSION
+    function updateReviewDisplay(orderId, reviewData, isEdit) {
+        const reviewHtml = `
+            <h6 class="text-success mb-2">
+                <i class="fas fa-star mr-1"></i>
+                Review Anda
+            </h6>
+            <div class="rating-display mb-2">
+                ${reviewData.rating_stars}
+                <span class="ml-2 text-muted">(${reviewData.rating_text})</span>
+            </div>
+            ${reviewData.comment ? `<p class="review-comment">${reviewData.comment}</p>` : ''}
+            <small class="text-muted">${reviewData.created_at}</small>
+            <div class="mt-2">
+                <button class="btn btn-sm btn-outline-warning" onclick="editReview('${orderId}')">
+                    <i class="fas fa-edit mr-1"></i>
+                    Edit Review
+                </button>
+            </div>
+            <!-- Hidden data for JavaScript -->
+            <div class="d-none review-data" 
+                 data-rating="${reviewData.rating}" 
+                 data-comment="${reviewData.comment || ''}">
+            </div>
+        `;
 
-        if (noReviewElement) {
-            // Replace no-review with review display
-            noReviewElement.innerHTML = `
-                <h6 class="text-success mb-2">
-                    <i class="fas fa-star mr-1"></i>
-                    Review Anda
-                </h6>
-                <div class="rating-display mb-2">
-                    ${reviewData.rating_stars}
-                    <span class="ml-2 text-muted">(${reviewData.rating_text})</span>
-                </div>
-                ${reviewData.comment ? `<p class="review-comment">${reviewData.comment}</p>` : ''}
-                <small class="text-muted">${reviewData.created_at}</small>
-                <div class="mt-2">
-                    <button class="btn btn-sm btn-outline-warning" onclick="editReview(${orderId})">
-                        <i class="fas fa-edit mr-1"></i>
-                        Edit Review
-                    </button>
-                </div>
-            `;
-            noReviewElement.id = `review-display-${orderId}`;
-        } else if (reviewDisplayElement) {
+        if (isEdit) {
             // Update existing review display
-            reviewDisplayElement.innerHTML = `
-                <h6 class="text-success mb-2">
-                    <i class="fas fa-star mr-1"></i>
-                    Review Anda
-                </h6>
-                <div class="rating-display mb-2">
-                    ${reviewData.rating_stars}
-                    <span class="ml-2 text-muted">(${reviewData.rating_text})</span>
-                </div>
-                ${reviewData.comment ? `<p class="review-comment">${reviewData.comment}</p>` : ''}
-                <small class="text-muted">${reviewData.created_at}</small>
-                <div class="mt-2">
-                    <button class="btn btn-sm btn-outline-warning" onclick="editReview(${orderId})">
-                        <i class="fas fa-edit mr-1"></i>
-                        Edit Review
-                    </button>
-                </div>
-            `;
+            const reviewDisplayElement = document.getElementById(`review-display-${orderId}`);
+            if (reviewDisplayElement) {
+                reviewDisplayElement.innerHTML = reviewHtml;
+            }
+        } else {
+            // Replace no-review with review display
+            const noReviewElement = document.getElementById(`no-review-${orderId}`);
+            if (noReviewElement) {
+                noReviewElement.innerHTML = reviewHtml;
+                noReviewElement.id = `review-display-${orderId}`;
+                noReviewElement.className = 'existing-review';
+            }
         }
     }
 </script>
