@@ -144,12 +144,12 @@ class AdminOrderController extends Controller
                     return [
                         'id' => $order->id,
                         'user' => [
-                            'name' => $order->user->name,
-                            'email' => $order->user->email,
+                            'name' => optional($order->user)->name ?? '-',
+                            'email' => optional($order->user)->email ?? '-',
                         ],
                         'service' => [
-                            'name' => $order->service->name,
-                            'price' => $order->service->price,
+                            'name' => optional($order->service)->name ?? '-',
+                            'price' => optional($order->service)->price ?? 0,
                         ],
                         'delivery_method' => $order->delivery_method,
                         'delivery_method_label' => $order->delivery_method_label,

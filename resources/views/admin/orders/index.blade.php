@@ -199,7 +199,9 @@
                         <td>
                             <strong>{{ $order->service->name ?? 'Layanan telah dihapus'}}</strong>
                             <br>
-                            <small class="text-muted">Rp{{ number_format($order->service->price, 0, ',', '.') }}</small>
+                            <small class="text-muted">
+                                Rp{{ optional($order->service)->price ? number_format($order->service->price, 0, ',', '.') : '-' }}
+                            </small>
                         </td>
                         <td>
                             <span class="badge badge-{{ $order->delivery_method == 'antar_jemput' ? 'info' : 'secondary' }}">

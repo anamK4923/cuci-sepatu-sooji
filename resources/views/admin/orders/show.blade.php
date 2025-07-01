@@ -59,7 +59,7 @@
                             </tr>
                             <tr>
                                 <td><strong>Harga:</strong></td>
-                                <td>Rp{{ number_format($order->service->price, 0, ',', '.') }}</td>
+                                <td>Rp{{ optional($order->service)->price ? number_format($order->service->price, 0, ',', '.') : '-' }}</td>
                             </tr>
                             <tr>
                                 <td><strong>Total:</strong></td>
@@ -154,7 +154,7 @@
         </div>
 
         <!-- Service Image Card -->
-        @if($order->service->image)
+        @if(optional($order->service)->image)
         <div class="card card-info">
             <div class="card-header">
                 <h3 class="card-title">
@@ -164,12 +164,13 @@
             </div>
             <div class="card-body text-center">
                 <img src="{{ asset('storage/' . $order->service->image) }}"
-                    alt="{{ $order->service->name }}"
+                    alt="{{ optional($order->service)->name }}"
                     class="img-fluid img-thumbnail"
                     style="max-height: 300px;">
             </div>
         </div>
         @endif
+
     </div>
 
     <div class="col-md-4">

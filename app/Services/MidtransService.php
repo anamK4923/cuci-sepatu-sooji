@@ -60,7 +60,7 @@ class MidtransService
                         'id' => $order->service->id,
                         'price' => (int) $order->total_price,
                         'quantity' => 1,
-                        'name' => $order->service->name,
+                        'name' => optional($order->user)->name ?? '-',
                     ]
                 ],
                 'callbacks' => [
