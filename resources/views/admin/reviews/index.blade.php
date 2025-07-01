@@ -195,7 +195,7 @@
                         </div>
                     </td>
                     <td>
-                        <span class="badge badge-info">{{ $review->order->service->name }}</span>
+                        <span class="badge badge-info">{{ $review->order->service->name ?? 'Layanan telah dihapus'}}</span>
                     </td>
                     <td>
                         <div class="d-flex align-items-center">

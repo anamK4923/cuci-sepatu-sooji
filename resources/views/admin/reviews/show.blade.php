@@ -39,7 +39,7 @@
 
                         <strong>Layanan:</strong>
                         <p class="text-muted">
-                            <span class="badge badge-info">{{ $review->order->service->name }}</span>
+                            <span class="badge badge-info">{{ $review->order->service->name ?? 'Layanan telah dihapus' }}</span>
                         </p>
                     </div>
                     <div class="col-md-6">

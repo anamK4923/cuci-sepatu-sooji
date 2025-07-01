@@ -19,7 +19,13 @@ class ServiceController extends Controller
      */
     public function indexMember()
     {
-        $services = Service::orderBy('name')->get();
+        $services = Service::whereNotNull('name')
+            ->whereNotNull('price')
+            ->where('price', '>', 0)
+            ->whereNotNull('description')
+            ->whereNotNull('image')
+            ->orderBy('name')
+            ->get();
 
         return view('member.services.index', compact('services'));
     }
@@ -51,7 +57,7 @@ class ServiceController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|unique:services,name',
             'price' => 'required|numeric',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
@@ -75,7 +81,7 @@ class ServiceController extends Controller
     public function update(Request $request, Service $service)
     {
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|unique:services,name',
             'price' => 'required|numeric',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);

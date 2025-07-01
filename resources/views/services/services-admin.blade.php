@@ -95,18 +95,18 @@
                     Refresh
                 </button>
             </div>
-            <div class="col-md-6 text-right">
+            <!-- <div class="col-md-6 text-right">
                 <div class="btn-group" role="group">
-                    <!-- <button type="button" class="btn btn-outline-secondary btn-sm" onclick="exportData('excel')">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="exportData('excel')">
                         <i class="fas fa-file-excel mr-1"></i>
                         Excel
-                    </button> -->
+                    </button>
                     <button type="button" class="btn btn-outline-secondary btn-sm" onclick="exportData('pdf')">
                         <i class="fas fa-file-pdf mr-1"></i>
                         PDF
                     </button>
                 </div>
-            </div>
+            </div> -->
         </div>
 
         <!-- Services Table -->
@@ -196,14 +196,7 @@
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <button type="button"
-                                    class="btn btn-info btn-sm"
-                                    data-toggle="modal"
-                                    data-target="#viewModal"
-                                    data-service="{{ json_encode($service) }}"
-                                    title="Lihat Detail">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button type="button"
+                                    id="buttonDelete"
                                     class="btn btn-danger btn-sm delete-btn"
                                     data-id="{{ $service->id }}"
                                     data-name="{{ $service->name }}"
@@ -284,7 +277,7 @@
 </div>
 
 <!-- Delete Form (Hidden) -->
-<form id="deleteForm" method="POST" style="display: none;">
+<form id="deleteForm" method="POST" action="" style="display: none;">
     @csrf
     @method('DELETE')
 </form>
@@ -393,7 +386,7 @@
         });
 
         // Delete confirmation
-        $('.delete-btn').on('click', function() {
+        $('#buttonDelete').on('click', function() {
             var serviceId = $(this).data('id');
             var serviceName = $(this).data('name');
 
@@ -420,6 +413,36 @@
         $('#servicesTable').DataTable().ajax.reload();
         location.reload(); // Simple refresh for now
     }
+
+    document.querySelector('.delete-btn').addEventListener('click', function() {
+        const serviceId = this.dataset.id;
+        const serviceName = this.dataset.name;
+
+        Swal.fire({
+            title: 'Hapus Layanan?',
+            text: `Yakin ingin menghapus layanan "${serviceName}"?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading
+                Swal.fire({
+                    title: 'Menghapus...',
+                    text: 'Sedang memproses permintaan',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading()
+                    }
+                });
+
+                const form = document.getElementById('deleteForm');
+                form.action = `/services-admin/${serviceId}`;
+                form.submit();
+            }
+        });
+    });
 
     function exportData(format) {
         // Placeholder for export functionality

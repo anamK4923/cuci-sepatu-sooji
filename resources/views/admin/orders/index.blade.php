@@ -197,7 +197,7 @@
                             <small class="text-muted">{{ $order->user->email }}</small>
                         </td>
                         <td>
-                            <strong>{{ $order->service->name }}</strong>
+                            <strong>{{ $order->service->name ?? 'Layanan telah dihapus'}}</strong>
                             <br>
                             <small class="text-muted">Rp{{ number_format($order->service->price, 0, ',', '.') }}</small>
                         </td>

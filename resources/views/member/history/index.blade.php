@@ -131,7 +131,7 @@
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <h5 class="mb-1">
                                         <i class="fas fa-concierge-bell text-primary mr-2"></i>
-                                        {{ $order->service->name }}
+                                        {{ $order->service->name ?? 'Layanan telah dihapus' }}
                                     </h5>
                                     <span class="badge badge-success">
                                         <i class="fas fa-check-circle mr-1"></i>

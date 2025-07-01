@@ -13,8 +13,14 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('service_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')
+                ->nullable()
+                ->constrained()
+                ->nullOnDelete(); // jika user dihapus, set user_id menjadi NULL
+            $table->foreignId('service_id')
+                ->nullable()
+                ->constrained()
+                ->nullOnDelete(); // jika service dihapus, set service_id menjadi NULL
             $table->enum('delivery_method', ['antar_jemput', 'drop_off']);
             $table->text('alamat_pickup')->nullable();
             $table->dateTime('pickup_schedule')->nullable();

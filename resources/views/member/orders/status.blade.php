@@ -85,7 +85,7 @@
                             <i class="fas fa-concierge-bell mr-1"></i>
                             Layanan
                         </h6>
-                        <p class="mb-2">{{ $order->service->name }}</p>
+                        <p class="mb-2">{{ $order->service->name ?? 'Layanan telah dihapus' }}</p>
 
                         <h6 class="text-success">
                             <i class="fas fa-money-bill-wave mr-1"></i>

@@ -501,7 +501,7 @@
                                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
                                             <div>
                                                 <h5 class="mb-1">{{ $review->user->name }}</h5>
-                                                <small class="text-muted">Pelanggan {{ $review->order->service->name }}</small>
+                                                <small class="text-muted">Pelanggan {{ $review->order->service->name ?? 'Layanan telah dihapus' }}</small>
                                                 <div class="stars my-1">
                                                     @for($i = 1; $i <= 5; $i++)
                                                         <i class="bi {{ $i <= $review->rating ? 'bi-star-fill text-warning' : 'bi-star text-muted' }}"></i>

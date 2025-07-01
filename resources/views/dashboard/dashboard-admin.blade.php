@@ -292,7 +292,7 @@
                                     <strong>{{ $order->user->name }}</strong><br>
                                     <small class="text-muted">{{ $order->user->email }}</small>
                                 </td>
-                                <td>{{ $order->service->name }}</td>
+                                <td>{{ $order->service->name ?? 'Layanan telah dihapus' }}</td>
                                 <td>
                                     <span class="badge badge-success">
                                         Rp{{ number_format($order->total_price, 0, ',', '.') }}
@@ -373,7 +373,7 @@
                                     @endfor
                             </div>
                         </div>
-                        <small class="text-muted">{{ $review->order->service->name }}</small>
+                        <small class="text-muted">{{ $review->order->service->name ?? 'Layanan telah dihapus' }}</small>
                         @if($review->comment)
                         <p class="mb-1 mt-2">{{ Str::limit($review->comment, 80) }}</p>
                         @endif

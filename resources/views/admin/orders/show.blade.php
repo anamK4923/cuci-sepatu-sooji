@@ -55,7 +55,7 @@
                         <table class="table table-borderless">
                             <tr>
                                 <td width="120"><strong>Layanan:</strong></td>
-                                <td>{{ $order->service->name }}</td>
+                                <td>{{ $order->service->name ?? 'Layanan telah dihapus' }}</td>
                             </tr>
                             <tr>
                                 <td><strong>Harga:</strong></td>
@@ -364,7 +364,7 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>{{ $order->service->name }}</td>
+                        <td>{{ $order->service->name ?? 'Layanan telah dihapus'}}</td>
                         <td>{{ $order->delivery_method_label }}</td>
                         <td>Rp{{ number_format($order->total_price, 0, ',', '.') }}</td>
                     </tr>

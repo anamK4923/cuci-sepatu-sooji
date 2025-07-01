@@ -397,7 +397,7 @@
                     <td>#{{ $order->id }}</td>
                     <td>{{ $order->created_at->format('d/m/Y') }}</td>
                     <td>{{ $order->user->name }}</td>
-                    <td>{{ $order->service->name }}</td>
+                    <td>{{ $order->service->name ?? 'Layanan telah dihapus'}}</td>
                     <td>
                         <span class="badge 
                             @if($order->status == 'completed') badge-success
