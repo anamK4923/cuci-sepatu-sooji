@@ -17,9 +17,26 @@
                 </h3>
                 <div class="card-tools">
                     <span class="badge badge-{{ getStatusBadgeClass($order->status) }} badge-lg">
-                        {{ $order->status_label }}
+                        @php
+                        $customStatusLabel = $order->status_label;
+
+                        if ($order->delivery_method === 'drop_off') {
+                        if ($order->status === 'waiting_pickup') {
+                        $customStatusLabel = 'Menunggu Pengantaran';
+                        } elseif ($order->status === 'picked_up') {
+                        $customStatusLabel = 'Sudah Diantar';
+                        }
+                        } else {
+                        if ($order->status === 'ready') {
+                        $customStatusLabel = 'Siap Diantar';
+                        }
+                        }
+                        @endphp
+
+                        {{ $customStatusLabel }}
                     </span>
                 </div>
+
             </div>
 
             <div class="card-body">
@@ -186,25 +203,48 @@
                 <!-- Update Status -->
                 <div class="form-group">
                     <label>Update Status Pesanan</label>
-                    <select class="form-control" id="statusSelect">
+
+                    @php
+                    $statuses = [
+                    'waiting_pickup' => 'Menunggu Penjemputan',
+                    'picked_up' => 'Sudah Dijemput',
+                    'in_process' => 'Sedang Diproses',
+                    'ready' => 'Siap Diantar',
+                    'done' => 'Selesai',
+                    'cancelled' => 'Dibatalkan',
+                    ];
+                    @endphp
+
+                    <select class="form-control" id="statusSelect" {{ $order->status === 'done' ? 'disabled' : '' }}>
                         <option value="">Pilih Status Baru</option>
-                        @php
-                        $statuses = [
-                        'waiting_pickup' => 'Menunggu Penjemputan',
-                        'picked_up' => 'Sudah Dijemput',
-                        'in_process' => 'Sedang Diproses',
-                        'ready' => 'Siap Diambil',
-                        'done' => 'Selesai',
-                        'cancelled' => 'Dibatalkan',
-                        ];
-                        @endphp
+
+                        @if($order->status === 'waiting_pickup')
+                        @if($order->status !== 'picked_up')
+                        <option value="picked_up">
+                            {{ $order->delivery_method === 'drop_off' ? 'Sudah Diantar' : $statuses['picked_up'] }}
+                        </option>
+                        @endif
+                        @else
                         @foreach($statuses as $key => $label)
-                        @if($key != $order->status)
-                        <option value="{{ $key }}">{{ $label }}</option>
+                        @if($key !== $order->status)
+                        @php
+                        // Custom label override
+                        $customLabel = $label;
+
+                        if ($order->delivery_method === 'drop_off') {
+                        if ($key === 'waiting_pickup') $customLabel = 'Menunggu Pengantaran';
+                        elseif ($key === 'picked_up') $customLabel = 'Sudah Diantar';
+                        elseif ($key === 'ready') $customLabel = 'Siap Diambil';
+                        }
+                        @endphp
+
+                        <option value="{{ $key }}">{{ $customLabel }}</option>
                         @endif
                         @endforeach
+                        @endif
                     </select>
-                    <button class="btn btn-primary btn-sm mt-2" onclick="updateStatus()">
+
+                    <button class="btn btn-primary btn-sm mt-2" onclick="updateStatus()" {{ $order->status === 'done' ? 'disabled' : '' }}>
                         <i class="fas fa-sync mr-1"></i>
                         Update Status
                     </button>
@@ -215,16 +255,16 @@
                 <!-- Update Payment Status -->
                 <div class="form-group">
                     <label>Status Pembayaran</label>
-                    <div class="btn-group btn-group-toggle d-flex" data-toggle="buttons">
+                    <div class="btn-group btn-group-toggle d-flex flex-column" data-toggle="buttons">
                         <label class="btn btn-outline-warning {{ $order->payment_status == 'pending' ? 'active' : '' }}">
                             <input type="radio" name="payment_status" value="pending"
                                 {{ $order->payment_status == 'pending' ? 'checked' : '' }}>
-                            Pending
+                            Menunggu Dibayar
                         </label>
                         <label class="btn btn-outline-success {{ $order->payment_status == 'paid' ? 'active' : '' }}">
                             <input type="radio" name="payment_status" value="paid"
                                 {{ $order->payment_status == 'paid' ? 'checked' : '' }}>
-                            Paid
+                            Sudah Dibayar
                         </label>
                     </div>
                     <button class="btn btn-success btn-sm mt-2" onclick="updatePaymentStatus()">
@@ -245,10 +285,10 @@
                         <i class="fas fa-envelope mr-2"></i>
                         Kirim Notifikasi
                     </button> -->
-                    <button class="btn btn-danger btn-block" onclick="deleteOrder()">
+                    <!-- <button class="btn btn-danger btn-block" onclick="deleteOrder()">
                         <i class="fas fa-trash mr-2"></i>
                         Hapus Pesanan
-                    </button>
+                    </button> -->
                 </div>
             </div>
         </div>

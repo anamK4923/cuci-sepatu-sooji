@@ -85,10 +85,10 @@
                     <select name="payment_status" class="form-control form-control-sm">
                         <option value="">Status Pembayaran</option>
                         <option value="pending" {{ request('payment_status') == 'pending' ? 'selected' : '' }}>
-                            Pending
+                            Menunggu Pembayaran
                         </option>
                         <option value="paid" {{ request('payment_status') == 'paid' ? 'selected' : '' }}>
-                            Paid
+                            Tandai Sudah Dibayar
                         </option>
                     </select>
                 </div>
@@ -148,7 +148,7 @@
                                 <option value="">Pilih Aksi</option>
                                 <option value="update_status">Update Status</option>
                                 <option value="update_payment_status">Update Status Pembayaran</option>
-                                <option value="delete">Hapus</option>
+                                <!-- <option value="delete">Hapus</option> -->
                             </select>
                             <div class="input-group-append ml-2">
                                 <button type="submit" class="btn btn-warning">
@@ -179,6 +179,7 @@
                         <th width="120">Status</th>
                         <th width="100">Pembayaran</th>
                         <th width="100">Tanggal</th>
+                        <th width="100">Alamat</th>
                         <th width="120">Aksi</th>
                     </tr>
                 </thead>
@@ -222,19 +223,64 @@
                         </td>
                         <td>
                             <div class="dropdown">
-                                <button class="btn btn-sm btn-{{ getStatusBadgeClass($order->status) }} dropdown-toggle"
-                                    type="button" data-toggle="dropdown">
-                                    {{ $order->status_label }}
+                                <button
+                                    class="btn btn-sm btn-{{ getStatusBadgeClass($order->status) }} {{ $order->status_label !== 'Selesai' ? 'dropdown-toggle' : '' }}"
+                                    type="button">
+                                    {{
+                                        $order->delivery_method_label === "Drop Off" && $order->status_label === "Menunggu Penjemputan"
+                                            ? "Menunggu Pengantaran"
+                                            : (
+                                                $order->delivery_method_label === "Drop Off" && $order->status_label === "Sudah Dijemput"
+                                                    ? "Sudah Diantar"
+                                                    : (
+                                                        $order->delivery_method_label === "Drop Off" && $order->status_label === "Siap Diambil"
+                                                            ? $order->status_label
+                                                            : (
+                                                                $order->status_label === "Selesai"
+                                                                    ? "Selesai"
+                                                                    : "Siap Diantar"
+                                                            )
+                                                    )
+                                            )
+                                    }}
                                 </button>
                                 <div class="dropdown-menu">
+                                    @if($order->status_label === "Menunggu Penjemputan")
+                                    @foreach($statuses as $statusKey => $statusLabel)
+                                    @if($statusKey === "picked_up")
+                                    <a class="dropdown-item" href="#"
+                                        onclick="updateStatus('{{ $order->id }}', '{{ $statusKey }}')">
+                                        {{ $order->delivery_method_label === "Drop Off" ? "Sudah Diantar" : $statusLabel }}
+                                    </a>
+                                    @endif
+                                    @endforeach
+                                    @else
                                     @foreach($statuses as $statusKey => $statusLabel)
                                     @if($statusKey != $order->status)
+                                    @if($statusKey === "waiting_pickup")
+                                    <a class="dropdown-item" href="#"
+                                        onclick="updateStatus('{{ $order->id }}', '{{ $statusKey }}')">
+                                        {{ $order->delivery_method_label === "Drop Off" ? "Menunggu Pengantaran" : $statusLabel }}
+                                    </a>
+                                    @elseif($statusKey === "picked_up")
+                                    <a class="dropdown-item" href="#"
+                                        onclick="updateStatus('{{ $order->id }}', '{{ $statusKey }}')">
+                                        {{ $order->delivery_method_label === "Drop Off" ? "Sudah Diantar" : $statusLabel }}
+                                    </a>
+                                    @elseif($statusKey === "ready")
+                                    <a class="dropdown-item" href="#"
+                                        onclick="updateStatus('{{ $order->id }}', '{{ $statusKey }}')">
+                                        {{ $order->delivery_method_label === "Drop Off" ? $statusLabel : "Siap Diantar" }}
+                                    </a>
+                                    @else
                                     <a class="dropdown-item" href="#"
                                         onclick="updateStatus('{{ $order->id }}', '{{ $statusKey }}')">
                                         {{ $statusLabel }}
                                     </a>
                                     @endif
+                                    @endif
                                     @endforeach
+                                    @endif
                                 </div>
                             </div>
                         </td>
@@ -264,17 +310,20 @@
                             <br>
                             <small class="text-muted">{{ $order->created_at->format('H:i') }}</small>
                         </td>
+                        <td class="text-left text-capitalize">
+                            {{$order->alamat_pickup ?? "-"}}
+                        </td>
                         <td>
                             <div class="btn-group" role="group">
                                 <a href="{{ route('admin.orders.show', $order) }}"
                                     class="btn btn-info btn-sm" data-toggle="tooltip" title="Lihat Detail">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <button type="button" class="btn btn-danger btn-sm"
+                                <!-- <button type="button" class="btn btn-danger btn-sm"
                                     onclick="deleteOrder('{{ $order->id }}')"
                                     data-toggle="tooltip" title="Hapus">
                                     <i class="fas fa-trash"></i>
-                                </button>
+                                </button> -->
                             </div>
                         </td>
                     </tr>

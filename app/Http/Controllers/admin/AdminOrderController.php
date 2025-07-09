@@ -68,7 +68,7 @@ class AdminOrderController extends Controller
             Order::STATUS_IN_PROCESS => 'Sedang Diproses',
             Order::STATUS_READY => 'Siap Diambil',
             Order::STATUS_COMPLETED => 'Selesai',
-            Order::STATUS_CANCELLED => 'Dibatalkan',
+            // Order::STATUS_CANCELLED => 'Dibatalkan',
         ];
 
         return view('admin.orders.index', compact('orders', 'stats', 'services', 'statuses'));
