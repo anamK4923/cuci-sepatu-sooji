@@ -178,11 +178,33 @@ class ReportController extends Controller
                 ];
             });
 
+        // Service performance chart
+        $serviceChart = [
+            'labels' => $this->getServiceAnalysis($startDate, $endDate)->pluck('name')->toArray(),
+            'datasets' => [
+                [
+                    'label' => 'Revenue',
+                    'data' => $this->getServiceAnalysis($startDate, $endDate)->pluck('revenue')->toArray(),
+                    'backgroundColor' => [
+                        '#007bff',
+                        '#28a745',
+                        '#ffc107',
+                        '#dc3545',
+                        '#6f42c1',
+                        '#20c997',
+                        '#fd7e14'
+                    ],
+                    'hoverOffset' => 10
+                ]
+            ]
+        ];
+
         return [
             'daily' => $chartData,
             'status' => $statusData,
             'payment' => $paymentData,
             'delivery' => $deliveryData,
+            'service_chart' => $serviceChart,
             // Prepared data for Chart.js
             'revenue_chart' => [
                 'labels' => collect($chartData)->pluck('formatted_date')->toArray(),

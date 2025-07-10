@@ -67,7 +67,7 @@ return [
     |
     */
 
-    'logo' => '<b>Cuci Sepatu</b> Soooji',
+    'logo' => '<b>SOOOJI.ID</b> ',
     'logo_img' => 'images/web/apple-touch-icon.png',
     'logo_img_class' => 'brand-image img-circle elevation-1',
     'logo_img_xl' => null,

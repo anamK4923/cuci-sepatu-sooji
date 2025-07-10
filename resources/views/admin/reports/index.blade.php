@@ -167,10 +167,34 @@
                 </h3>
             </div>
             <div class="card-body">
-                <canvas id="statusChart"></canvas>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th class="text-center">Jumlah</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($charts['status'] as $item)
+                            <tr>
+                                <td>
+                                    <span class="badge" style="background-color: '{{ $item['color'] }}'; color: #000000;">
+                                        {{ $item['status_label'] }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge badge-primary">{{ $item['count'] }}</span>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
+
 </div>
 
 <!-- Second Charts Row -->
@@ -208,7 +232,7 @@
 
 <!-- Analysis Tables -->
 <div class="row">
-    <!-- Service Analysis -->
+    <!-- Performa Layanan -->
     <div class="col-md-6">
         <div class="card card-success">
             <div class="card-header">
@@ -218,33 +242,11 @@
                 </h3>
             </div>
             <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>Layanan</th>
-                                <th class="text-center">Orders</th>
-                                <th class="text-right">Revenue</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($services as $service)
-                            <tr>
-                                <td>{{ $service->name }}</td>
-                                <td class="text-center">
-                                    <span class="badge badge-primary">{{ $service->total_orders }}</span>
-                                </td>
-                                <td class="text-right">
-                                    <strong>Rp{{ number_format($service->revenue, 0, ',', '.') }}</strong>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                <canvas id="serviceChart"></canvas>
             </div>
         </div>
     </div>
+
 
     <!-- Top Customers -->
     <div class="col-md-6">
@@ -338,20 +340,20 @@
     });
 
     // Status Chart
-    const statusCtx = document.getElementById('statusChart').getContext('2d');
-    const statusChart = new Chart(statusCtx, {
-        type: 'doughnut',
-        data: chartData.status_chart,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }
-    });
+    // const statusCtx = document.getElementById('statusChart').getContext('2d');
+    // const statusChart = new Chart(statusCtx, {
+    //     type: 'doughnut',
+    //     data: chartData.status_chart,
+    //     options: {
+    //         responsive: true,
+    //         maintainAspectRatio: false,
+    //         plugins: {
+    //             legend: {
+    //                 position: 'bottom'
+    //             }
+    //         }
+    //     }
+    // });
 
     // Payment Chart
     const paymentCtx = document.getElementById('paymentChart').getContext('2d');
@@ -401,6 +403,32 @@
             }
         }
     });
+
+    // Service Chart
+    const serviceCtx = document.getElementById('serviceChart').getContext('2d');
+    const serviceChart = new Chart(serviceCtx, {
+        type: 'doughnut',
+        data: chartData.service_chart,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            let value = Number(context.raw) || 0;
+                            return `${label}: Rp${value.toLocaleString('id-ID')}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
 
     function exportPDF() {
         Swal.fire({

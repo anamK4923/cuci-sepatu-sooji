@@ -225,7 +225,8 @@
                             <div class="dropdown">
                                 <button
                                     class="btn btn-sm btn-{{ getStatusBadgeClass($order->status) }} {{ $order->status_label !== 'Selesai' ? 'dropdown-toggle' : '' }}"
-                                    type="button">
+                                    type="button"
+                                    @if ($order->status_label !== 'Selesai') data-toggle="dropdown" @endif >
                                     {{
                                         $order->delivery_method_label === "Drop Off" && $order->status_label === "Menunggu Penjemputan"
                                             ? "Menunggu Pengantaran"
@@ -238,7 +239,7 @@
                                                             : (
                                                                 $order->status_label === "Selesai"
                                                                     ? "Selesai"
-                                                                    : "Siap Diantar"
+                                                                    : $order->status_label
                                                             )
                                                     )
                                             )
