@@ -128,7 +128,7 @@
                     <li><a href="{{ url('#hero') }}" class="active">Beranda</a></li>
                     <li><a href="{{ url('#about') }}">Tentang</a></li>
                     <li><a href="{{ url('#services') }}">Layanan</a></li>
-                    <li><a href="{{ url('#portfolio') }}">Galeri</a></li>
+                    <!-- <li><a href="{{ url('#portfolio') }}">Galeri</a></li> -->
                     <li><a href="{{ url('#testimonials') }}">Testimoni</a></li>
                     <li><a href="{{ url('#contact') }}">Kontak</a></li>
                 </ul>
@@ -321,14 +321,12 @@
         </section><!-- /Services Section -->
 
         <!-- Portfolio Section -->
-        <section id="portfolio" class="portfolio section">
+        <!-- <section id="portfolio" class="portfolio section">
 
-            <!-- Section Title -->
             <div class="container section-title" data-aos="fade-up">
                 <h2>Galeri</h2>
                 <p>Lihat hasil perawatan sepatu dari pelanggan kami — dari yang kusam jadi kinclong kembali!</p>
             </div>
-            <!-- End Section Title -->
 
             <div class="container">
 
@@ -340,7 +338,6 @@
                         <li data-filter=".filter-repaint">Repaint</li>
                         <li data-filter=".filter-fastclean">Fast Clean</li>
                     </ul>
-                    <!-- End Portfolio Filters -->
 
                     <div class="row gy-4 isotope-container" data-aos="fade-up" data-aos-delay="200">
 
@@ -352,7 +349,7 @@
                                 <a href="/images/galeri-1.jpeg" title="Deep Clean Result" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                                 <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                             </div>
-                        </div><!-- End Portfolio Item -->
+                        </div>
 
                         <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-repaint">
                             <img src="/images/galeri-2.jpeg" class="img-fluid" alt="">
@@ -362,7 +359,7 @@
                                 <a href="/images/galeri-2.jpeg" title="Repaint Service" data-gallery="portfolio-gallery-product" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                                 <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                             </div>
-                        </div><!-- End Portfolio Item -->
+                        </div>
 
                         <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-fastclean">
                             <img src="/images/galeri-3.jpeg" class="img-fluid" alt="">
@@ -372,7 +369,7 @@
                                 <a href="/images/galeri-3.jpeg" title="Fast Clean" data-gallery="portfolio-gallery-branding" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                                 <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                             </div>
-                        </div><!-- End Portfolio Item -->
+                        </div>
 
                         <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-deepclean">
                             <img src="/images/galeri-4.jpeg" class="img-fluid" alt="">
@@ -382,7 +379,7 @@
                                 <a href="/images/galeri-4.jpeg" title="Premium Care" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                                 <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                             </div>
-                        </div><!-- End Portfolio Item -->
+                        </div>
 
                         <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-repaint">
                             <img src="/images/galeri-5.jpeg" class="img-fluid" alt="">
@@ -392,7 +389,7 @@
                                 <a href="/images/galeri-5.jpeg" title="Color Restoration" data-gallery="portfolio-gallery-product" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                                 <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                             </div>
-                        </div><!-- End Portfolio Item -->
+                        </div>
 
                         <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-fastclean">
                             <img src="/images/galeri-6.jpeg" class="img-fluid" alt="">
@@ -402,7 +399,7 @@
                                 <a href="/images/galeri-6.jpeg" title="Quick Service" data-gallery="portfolio-gallery-branding" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                                 <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                             </div>
-                        </div><!-- End Portfolio Item -->
+                        </div>
 
                         <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-deepclean">
                             <img src="/images/galeri-7.jpeg" class="img-fluid" alt="">
@@ -412,15 +409,16 @@
                                 <a href="/images/galeri-7.jpeg" title="Professional Clean" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
                                 <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
                             </div>
-                        </div><!-- End Portfolio Item -->
+                        </div>
 
-                    </div><!-- End Portfolio Container -->
+                    </div>
 
                 </div>
 
             </div>
 
-        </section><!-- /Portfolio Section -->
+        </section> -->
+        <!-- /Portfolio Section -->
 
         <!-- Call To Action Section -->
         <section id="call-to-action" class="call-to-action section dark-background">
