@@ -85,9 +85,9 @@ class PaymentController extends Controller
             $transaction = $this->midtransService->createTransaction($order);
 
             // Update payment status setelah berhasil create transaction
-            $order->update([
-                'payment_status' => Order::PAYMENT_PAID
-            ]);
+            // $order->update([
+            //     'payment_status' => Order::PAYMENT_PAID
+            // ]);
 
             Log::info('Payment transaction created successfully', [
                 'order_id' => $order->id,
@@ -122,44 +122,68 @@ class PaymentController extends Controller
             Log::info('Midtrans notification received', [
                 'notification' => $notification,
                 'headers' => $request->headers->all(),
-                'ip' => $request->ip()
+                'ip' => $request->ip(),
             ]);
+
+            dd($notification);
 
             $orderId = $notification['order_id'] ?? null;
             $transactionStatus = $notification['transaction_status'] ?? null;
             $fraudStatus = $notification['fraud_status'] ?? '';
             $paymentType = $notification['payment_type'] ?? '';
+            $grossAmount = $notification['gross_amount'] ?? null;
+            $signatureKey = $notification['signature_key'] ?? null;
+            $statusCode = $notification['status_code'] ?? null;
 
             if (!$orderId || !$transactionStatus) {
-                Log::error('Invalid notification data', $notification);
+                Log::error('Invalid Midtrans notification data', $notification);
                 return response('Invalid notification data', 400);
             }
 
-            // Cari order berdasarkan midtrans_order_id
+            // Validasi Signature (opsional tapi direkomendasikan)
+            $expectedSignature = hash('sha512', $orderId . $statusCode . $grossAmount . config('midtrans.server_key'));
+
+            if ($signatureKey !== $expectedSignature) {
+                Log::warning('Invalid signature key received', [
+                    'order_id' => $orderId,
+                    'provided' => $signatureKey,
+                    'expected' => $expectedSignature,
+                ]);
+                return response('Invalid signature', 403);
+            }
+
             $order = Order::where('midtrans_order_id', $orderId)->first();
 
             if (!$order) {
-                Log::error('Order not found for Midtrans order ID: ' . $orderId);
+                Log::error("Order not found for Midtrans order ID: {$orderId}");
                 return response('Order not found', 404);
             }
 
             DB::beginTransaction();
 
             $oldPaymentStatus = $order->payment_status;
-
-            // Update status pembayaran berdasarkan status transaksi (IMPROVED LOGIC)
             $newPaymentStatus = $this->determinePaymentStatus($transactionStatus, $fraudStatus, $paymentType);
 
-            if ($newPaymentStatus) {
-                $order->update(['payment_status' => $newPaymentStatus]);
+            if ($newPaymentStatus && $newPaymentStatus !== $oldPaymentStatus) {
+                $order->update([
+                    'payment_status' => $newPaymentStatus,
+                    'paid_at' => in_array($newPaymentStatus, [Order::PAYMENT_PAID]) ? now() : null
+                ]);
 
-                Log::info('Order payment status updated via webhook', [
+                Log::info('Order payment status updated via Midtrans webhook', [
                     'order_id' => $order->id,
+                    'midtrans_order_id' => $order->midtrans_order_id,
                     'old_status' => $oldPaymentStatus,
-                    'new_status' => $order->payment_status,
+                    'new_status' => $newPaymentStatus,
                     'transaction_status' => $transactionStatus,
                     'fraud_status' => $fraudStatus,
                     'payment_type' => $paymentType
+                ]);
+            } else {
+                Log::info('No payment status update needed', [
+                    'order_id' => $order->id,
+                    'current_status' => $order->payment_status,
+                    'transaction_status' => $transactionStatus
                 ]);
             }
 
@@ -168,56 +192,39 @@ class PaymentController extends Controller
             return response('OK', 200);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Failed to handle Midtrans notification', [
+
+            Log::error('Failed to process Midtrans webhook', [
                 'error' => $e->getMessage(),
-                'notification' => $request->all(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
+                'notification' => $request->all()
             ]);
-            return response('Error processing notification', 500);
+
+            return response('Internal Server Error', 500);
         }
     }
+
+
 
     /**
      * Determine payment status based on Midtrans response
      */
     private function determinePaymentStatus($transactionStatus, $fraudStatus, $paymentType)
     {
-        switch ($transactionStatus) {
-            case 'capture':
-                // Credit card payment
-                if ($fraudStatus == 'challenge') {
-                    return Order::PAYMENT_PENDING; // Need manual review
-                } else {
-                    return Order::PAYMENT_PAID; // Successful
-                }
-                break;
-
-            case 'settlement':
-                // Bank transfer, e-wallet, etc. - always successful
-                return Order::PAYMENT_PAID;
-                break;
-
-            case 'pending':
-                // Payment initiated but not completed
-                return Order::PAYMENT_PENDING;
-                break;
-
-            case 'deny':
-            case 'expire':
-            case 'cancel':
-                // Failed payments
-                return Order::PAYMENT_FAILED;
-                break;
-
-            default:
-                Log::warning('Unknown transaction status', [
-                    'transaction_status' => $transactionStatus,
-                    'fraud_status' => $fraudStatus,
-                    'payment_type' => $paymentType
-                ]);
-                return null; // Don't update if unknown status
+        if (in_array($transactionStatus, ['settlement', 'capture']) && $fraudStatus !== 'deny') {
+            return Order::PAYMENT_PAID;
         }
+
+        if ($transactionStatus === 'pending') {
+            return Order::PAYMENT_PENDING;
+        }
+
+        if (in_array($transactionStatus, ['cancel', 'deny', 'expire'])) {
+            return Order::PAYMENT_FAILED;
+        }
+
+        return null; // Unknown status
     }
+
 
     /**
      * Handle pembayaran selesai dengan sukses
@@ -384,5 +391,21 @@ class PaymentController extends Controller
 
             return response()->json(['error' => 'Test payment failed'], 500);
         }
+    }
+
+    public function markPaid(Order $order)
+    {
+        if ($order->payment_status === Order::PAYMENT_PAID) {
+            return response()->json(['message' => 'Order already paid'], 200);
+        }
+
+        $order->update([
+            'payment_status' => Order::PAYMENT_PAID,
+            'paid_at' => now()
+        ]);
+
+        Log::info("Order {$order->id} manually marked as PAID from frontend");
+
+        return response()->json(['message' => 'Payment status updated'], 200);
     }
 }

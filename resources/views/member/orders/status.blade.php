@@ -62,17 +62,30 @@
                         'waiting_pickup' => ['class' => 'warning', 'icon' => 'clock', 'text' => 'Menunggu Penjemputan'],
                         'picked_up' => ['class' => 'info', 'icon' => 'truck', 'text' => 'Sudah Dijemput'],
                         'in_process' => ['class' => 'primary', 'icon' => 'cogs', 'text' => 'Sedang Diproses'],
-                        'ready' => ['class' => 'success', 'icon' => 'check', 'text' => 'Siap Diambil'],
+                        'ready' => ['class' => 'success', 'icon' => 'check', 'text' => 'Siap Diantar'],
                         'done' => ['class' => 'success', 'icon' => 'check-circle', 'text' => 'Selesai'],
-                        'cancelled' => ['class' => 'danger', 'icon' => 'times', 'text' => 'Dibatalkan']
+                        'cancelled' => ['class' => 'danger', 'icon' => 'times', 'text' => 'Dibatalkan'],
                         ];
+
                         $status = $statusConfig[$order->status] ?? ['class' => 'secondary', 'icon' => 'question', 'text' => 'Unknown'];
+
+                        // Override text sesuai delivery_method
+                        if ($order->delivery_method === 'drop_off') {
+                        if ($order->status === 'waiting_pickup') {
+                        $status['text'] = 'Menunggu Pengantaran';
+                        } elseif ($order->status === 'picked_up') {
+                        $status['text'] = 'Sudah Diantar';
+                        } elseif ($order->status === 'ready') {
+                        $status['text'] = 'Siap Diambil';
+                        }
+                        }
                         @endphp
 
-                        <span class="badge badge-{{ $status['class'] }} badge-lg">
+                        <span class="badge badge-{{ $status['class'] }}">
                             <i class="fas fa-{{ $status['icon'] }} mr-1"></i>
                             {{ $status['text'] }}
                         </span>
+
                     </div>
                 </div>
             </div>
@@ -180,9 +193,10 @@
                             'waiting_pickup' => 'Menunggu Penjemputan',
                             'picked_up' => 'Sudah Dijemput',
                             'in_process' => 'Sedang Diproses',
-                            'ready' => 'Siap Diambil',
+                            'ready' => 'Siap Diantar',
                             'done' => 'Selesai'
                             ];
+
                             $currentStepIndex = array_search($order->status, array_keys($steps));
                             @endphp
 
@@ -191,6 +205,13 @@
                             $stepIndex = array_search($stepKey, array_keys($steps));
                             $isActive = $stepIndex <= $currentStepIndex;
                                 $isCurrent=$stepKey==$order->status;
+
+                                // Custom label berdasarkan delivery_method
+                                if ($order->delivery_method === 'drop_off') {
+                                if ($stepKey === 'waiting_pickup') $stepName = 'Menunggu Pengantaran';
+                                elseif ($stepKey === 'picked_up') $stepName = 'Sudah Diantar';
+                                elseif ($stepKey === 'ready') $stepName = 'Siap Diambil';
+                                }
                                 @endphp
 
                                 <div class="timeline-item {{ $isActive ? 'active' : '' }} {{ $isCurrent ? 'current' : '' }}">
@@ -209,6 +230,7 @@
                                 </div>
                                 @endforeach
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -343,8 +365,23 @@
             if (data.snap_token) {
                 // Open Midtrans payment popup
                 snap.pay(data.snap_token, {
-                    onSuccess: function(result) {
+                    onSuccess: async function(result) {
                         console.log('Payment success:', result);
+
+                        try {
+                            // Trigger backend to update payment status
+                            await fetch(`/payment/mark-paid/${orderId}`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Accept': 'application/json'
+                                }
+                            });
+                        } catch (err) {
+                            console.warn('Failed to notify backend of successful payment:', err);
+                        }
+
                         Swal.fire({
                             title: 'Pembayaran Berhasil!',
                             text: 'Terima kasih, pembayaran Anda telah berhasil diproses.',

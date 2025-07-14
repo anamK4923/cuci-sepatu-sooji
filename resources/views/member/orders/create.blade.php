@@ -127,14 +127,11 @@
                             id="pickup_schedule"
                             class="form-control @error('pickup_schedule') is-invalid @enderror">
                             <option value="">Pilih Jadwal Penjemputan</option>
-                            <option value="10:00" {{ old('pickup_schedule') == '10:00' ? 'selected' : '' }}>
-                                <i class="fas fa-sun"></i> Jam 10.00 WIB - Pagi
+                            <option value="12:00" {{ old('pickup_schedule') == '12:00' ? 'selected' : '' }}>
+                                <i class="fas fa-sun"></i> Jam 12.00 WIB - Pagi
                             </option>
-                            <option value="14:00" {{ old('pickup_schedule') == '14:00' ? 'selected' : '' }}>
-                                <i class="fas fa-sun"></i> Jam 14.00 WIB - Siang
-                            </option>
-                            <option value="16:00" {{ old('pickup_schedule') == '16:00' ? 'selected' : '' }}>
-                                <i class="fas fa-cloud-sun"></i> Jam 16.00 WIB - Sore
+                            <option value="18:00" {{ old('pickup_schedule') == '18:00' ? 'selected' : '' }}>
+                                <i class="fas fa-cloud-sun"></i> Jam 18.00 WIB - Sore
                             </option>
                         </select>
                         @error('pickup_schedule')

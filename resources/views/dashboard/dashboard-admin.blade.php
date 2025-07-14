@@ -281,11 +281,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($recentOrders as $order)
+                            @forelse($recentOrders as $index => $order)
                             <tr>
                                 <td>
                                     <a href="{{ route('admin.orders.show', $order) }}" class="text-primary">
-                                        #{{ $order->id }}
+                                        {{ $index + 1}}
                                     </a>
                                 </td>
                                 <td>
@@ -464,6 +464,22 @@
                     beginAtZero: true,
                     ticks: {
                         stepSize: 1
+                    },
+                    title: {
+                        display: true,
+                        text: 'Pemesanan',
+                        font: {
+                            size: 16
+                        }
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Periode',
+                        font: {
+                            size: 16
+                        }
                     }
                 }
             },

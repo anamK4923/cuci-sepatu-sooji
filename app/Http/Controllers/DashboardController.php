@@ -71,7 +71,7 @@ class DashboardController extends Controller
         // Recent Orders
         $recentOrders = Order::with(['user', 'service'])
             ->orderBy('created_at', 'desc')
-            ->limit(10)
+            ->limit(5)
             ->get();
 
         // Orders by Status for Chart

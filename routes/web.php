@@ -106,6 +106,7 @@ Route::middleware(['member'])->group(function () {
 
 // Midtrans Webhook (no auth required)
 Route::post('/payment/notification', [PaymentController::class, 'notification'])->name('payment.notification');
+Route::post('/payment/mark-paid/{order}', [PaymentController::class, 'markPaid']);
 
 // API Routes for AJAX calls
 Route::middleware(['auth'])->prefix('api')->group(function () {
