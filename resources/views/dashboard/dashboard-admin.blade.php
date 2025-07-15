@@ -285,7 +285,7 @@
                             <tr>
                                 <td>
                                     <a href="{{ route('admin.orders.show', $order) }}" class="text-primary">
-                                        {{ $index + 1}}
+                                        {{ $order->id}}
                                     </a>
                                 </td>
                                 <td>

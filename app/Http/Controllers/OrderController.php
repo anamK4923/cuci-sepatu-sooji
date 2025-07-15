@@ -46,7 +46,7 @@ class OrderController extends Controller
             'pickup_schedule' => [
                 'required_if:delivery_method,' . Order::DELIVERY_ANTAR_JEMPUT,
                 'nullable',
-                Rule::in(['10:00', '14:00', '16:00'])
+                Rule::in(['12:00', '18:00'])
             ],
             'notes' => 'nullable|string|max:1000',
             'total_price' => 'required|numeric|min:0',
