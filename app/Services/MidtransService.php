@@ -55,6 +55,7 @@ class MidtransService
                     'email' => $order->user->email,
                     'phone' => $order->user->no_hp ?? '08123456789',
                 ],
+                'enabled_payments' => ['bca_va', 'bni_va', 'permata_va', 'danamon_va', 'mandiri_va', 'bri_va', 'cimb_va'],
                 'item_details' => [
                     [
                         'id' => $order->service->id,
