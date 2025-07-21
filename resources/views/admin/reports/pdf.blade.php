@@ -214,7 +214,7 @@
 <body>
     <!-- Header -->
     <div class="header">
-        <h1>CUCI SEPATU SOOOJI</h1>
+        <h1>CUCI SEPATU SOOOJI.ID</h1>
         <h2>Laporan Transaksi & Analisis Bisnis</h2>
         <div class="period">
             Periode: {{ $period['formatted_period'] }}<br>
@@ -435,7 +435,7 @@
     <!-- Footer -->
     <div class="footer">
         <div>
-            Laporan ini dibuat secara otomatis oleh sistem Cuci Sepatu Soooji<br>
+            Laporan ini dibuat secara otomatis oleh sistem Cuci Sepatu Soooji.ID<br>
             Dicetak pada: {{ $generated_at }} | Halaman <span class="pagenum"></span>
         </div>
     </div>

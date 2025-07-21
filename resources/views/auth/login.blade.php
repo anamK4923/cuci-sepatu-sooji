@@ -1,7 +1,7 @@
 <x-guest-layout title="Soooji - Login">
     <div class="text-center mb-6">
         <img src="{{ asset('images/web/icon-512.png') }}" class="w-16 h-16 mx-auto mb-2" alt="Logo">
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Welcome to Soooji! 👋</h1>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Welcome to Soooji.ID! 👋</h1>
         <p class="text-gray-600 dark:text-gray-400 text-sm mt-1">Please sign-in to your account and start the adventure</p>
     </div>
 

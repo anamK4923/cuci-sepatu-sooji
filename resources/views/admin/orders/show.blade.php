@@ -365,7 +365,7 @@
         <!-- Invoice Header -->
         <div class="invoice-header">
             <div class="company-info">
-                <h1>CUCI SEPATU SOOOJI</h1>
+                <h1>CUCI SEPATU SOOOJI.ID</h1>
                 <p>Jl. Contoh No. 123, Jakarta<br>
                     Telp: (021) 1234-5678<br>
                     Email: info@soooji.com</p>
@@ -459,7 +459,7 @@
 
         <!-- Footer -->
         <div class="invoice-footer">
-            <p><em>Terima kasih atas kepercayaan Anda menggunakan layanan Cuci Sepatu Soooji!</em></p>
+            <p><em>Terima kasih atas kepercayaan Anda menggunakan layanan Cuci Sepatu Soooji.ID!</em></p>
             <p><small>Invoice ini dicetak pada: <span id="printTime"></span></small></p>
         </div>
     </div>

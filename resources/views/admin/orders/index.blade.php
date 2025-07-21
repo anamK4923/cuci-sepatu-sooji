@@ -619,7 +619,7 @@
             });
 
             pdf.setFontSize(16);
-            pdf.text('CUCI SEPATU SOOOJI', pdf.internal.pageSize.getWidth() / 2, 30, {
+            pdf.text('CUCI SEPATU SOOOJI.ID', pdf.internal.pageSize.getWidth() / 2, 30, {
                 align: 'center'
             });
 

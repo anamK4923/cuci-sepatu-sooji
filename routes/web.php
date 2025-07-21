@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 
-Route::middleware(['admin'])->group(function () {
+Route::middleware(['admin', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'indexAdmin'])->name('dashboard.admin');
     Route::get('/services-admin', [ServiceController::class, 'index'])->name('services.admin');
     Route::get('/services-admin/create', [ServiceController::class, 'create'])->name('services.create');
@@ -72,7 +72,7 @@ Route::middleware(['admin'])->group(function () {
     });
 });
 
-Route::middleware(['member'])->group(function () {
+Route::middleware(['member', 'verified'])->group(function () {
     Route::get('/dashboard-member', [DashboardController::class, 'indexMember'])->name('dashboard.member');
 
     // Services Routes

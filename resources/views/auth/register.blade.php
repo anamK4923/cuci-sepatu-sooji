@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div class="text-center mb-6">
         <img src="{{ asset('images/web/icon-512.png') }}" class="w-16 h-16 mx-auto mb-2" alt="Logo">
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Buat Akun Soooji! 👋</h1>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Buat Akun Soooji.ID! 👋</h1>
     </div>
 
     <form method="POST" action="{{ route('register') }}">

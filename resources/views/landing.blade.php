@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Landing Page - Soooji</title>
+    <title>Landing Page - Soooji.ID</title>
     <meta name="description" content="">
     <meta name="keywords" content="">
 
@@ -150,8 +150,8 @@
             <div class="container">
                 <div class="row">
                     <div class="col-lg-10">
-                        <h2 data-aos="fade-up" data-aos-delay="100">Selamat Datang di Tempat Cuci Sepatu Terbaik</h2>
-                        <p data-aos="fade-up" data-aos-delay="200">Bikin sepatu kamu kembali bersih, segar, dan seperti baru lagi!</p>
+                        <h2 data-aos="fade-up" data-aos-delay="100">Selamat Datang di Tempat Cuci Sepatu SOOOJI.ID</h2>
+                        <p data-aos="fade-up" data-aos-delay="200">Budayakan malas, agar kita saling berbagi!</p>
                     </div>
                 </div>
             </div>
@@ -456,15 +456,15 @@
                             <strong>{{ $reviewStats['average_rating'] }} bintang</strong>.
                         </p>
                         <p>
-                            Kepuasan pelanggan adalah prioritas utama kami. Setiap sepatu yang dipercayakan kepada Soooji
+                            Kepuasan pelanggan adalah prioritas utama kami. Setiap sepatu yang dipercayakan kepada Soooji.ID
                             akan mendapatkan perawatan terbaik dengan hasil yang memuaskan.
                         </p>
                         @else
                         <p>
-                            "Sepatu saya yang sebelumnya kotor dan bau, sekarang kembali bersih dan wangi berkat Soooji! Prosesnya cepat dan hasilnya memuaskan. Recommended banget buat yang sayang sama sepatunya."
+                            "Sepatu saya yang sebelumnya kotor dan bau, sekarang kembali bersih dan wangi berkat Soooji.ID! Prosesnya cepat dan hasilnya memuaskan. Recommended banget buat yang sayang sama sepatunya."
                         </p>
                         <p>
-                            "Pelayanan ramah, harga terjangkau, dan hasil cucian sepatu sangat maksimal. Pokoknya langganan terus di Soooji!"
+                            "Pelayanan ramah, harga terjangkau, dan hasil cucian sepatu sangat maksimal. Pokoknya langganan terus di Soooji.ID!"
                         </p>
                         @endif
                     </div>
@@ -615,7 +615,7 @@
             <!-- Section Title -->
             <div class="container section-title" data-aos="fade-up">
                 <h2>Kontak Kami</h2>
-                <p>Butuh layanan cuci sepatu terbaik di kota kamu? Hubungi Soooji sekarang untuk info harga, layanan, atau booking cuci sepatu favoritmu!</p>
+                <p>Butuh layanan cuci sepatu terbaik di kota kamu? Hubungi Soooji.ID sekarang untuk info harga, layanan, atau booking cuci sepatu favoritmu!</p>
             </div><!-- End Section Title -->
 
             <div class="container" data-aos="fade-up" data-aos-delay="100">
@@ -697,7 +697,7 @@
 
                 <div class="col-lg-5 col-md-12 footer-about">
                     <a href="index.html" class="logo d-flex align-items-center">
-                        <span class="sitename">Soooji</span>
+                        <span class="sitename">Soooji.ID</span>
                     </a>
                     <p>Soooji adalah layanan cuci sepatu profesional yang siap merawat, membersihkan, dan menjaga sepatu kesayangan kamu tetap bersih, wangi, dan tampil seperti baru. Solusi sepatu bersih tanpa ribet!</p>
                     <div class="social-links d-flex mt-4">
@@ -741,7 +741,7 @@
         </div>
 
         <div class="container copyright text-center mt-4">
-            <p>© <span>Copyright</span> <strong class="sitename">Soooji</strong> <span>All Rights Reserved</span></p>
+            <p>© <span>Copyright</span> <strong class="sitename">Soooji.ID</strong> <span>All Rights Reserved</span></p>
             <div class="credits">
                 Designed by Rizqi
             </div>
@@ -777,7 +777,7 @@
 
             var noWa = "6287725161627"; // ganti ke nomor WA kamu (pakai kode negara, 62 untuk Indonesia)
 
-            var text = "Halo Soooji! Saya " + name + "%0A" +
+            var text = "Halo Soooji.ID! Saya " + name + "%0A" +
                 "Judul: " + subject + "%0A" +
                 "Pesan: " + message;
 

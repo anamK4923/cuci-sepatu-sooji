@@ -2,7 +2,7 @@
 
 @section('subtitle', 'Services Admin')
 @section('content_header_title', 'Services')
-@section('content_header_subtitle', 'Soooji - Admin Services')
+@section('content_header_subtitle', 'Soooji.ID - Admin Services')
 
 @section('content_body')
 

@@ -15,7 +15,7 @@
                     <div class="col-md-8">
                         <h3 class="text-white mb-2">
                             <i class="fas fa-hand-sparkles mr-2"></i>
-                            Selamat Datang di Soooji!
+                            Selamat Datang di Soooji.ID!
                         </h3>
                         <p class="text-white mb-0">
                             Pilih layanan cuci sepatu terbaik untuk kebutuhan Anda.
