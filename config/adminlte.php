@@ -308,6 +308,13 @@ return [
             'type' => 'fullscreen-widget',
             'topnav_right' => false,
         ],
+        [
+            'type'         => 'navbar-notification',
+            'id'           => 'cart-menu',
+            'icon'         => 'fas fa-shopping-cart',
+            'url'          => '/cart',
+            'topnav_right' => true,
+        ],
 
         // Sidebar items:
         [

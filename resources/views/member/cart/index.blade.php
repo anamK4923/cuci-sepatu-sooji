@@ -1,79 +1,111 @@
 @extends('layouts.app')
 
-@section('subtitle', 'Detail Layanan')
-@section('content_header_title', 'Layanan')
-@section('content_header_subtitle', 'Detail Layanan ' . $service->name)
+@section('subtitle', 'Keranjang Belanja')
+@section('content_header_title', 'Keranjang')
+@section('content_header_subtitle', 'Item di Keranjang Anda')
 
 @section('content_body')
 <div class="row justify-content-center">
     <div class="col-md-12">
-        <!-- Service Info Card -->
-        <div class="card card-primary mb-4">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-info-circle mr-2"></i>
-                    Layanan yang Dipilih
-                </h3>
-            </div>
-            <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-md-3">
-                        @if($service->image)
-                        <img src="{{ asset('storage/' . $service->image) }}"
-                            class="img-fluid img-thumbnail"
-                            alt="{{ $service->name }}">
-                        @else
-                        <div class="no-image-placeholder-small">
-                            <i class="fas fa-image fa-2x text-muted"></i>
-                        </div>
-                        @endif
-                    </div>
-                    <div class="col-md-9">
-                        <h4 class="text-primary">{{ $service->name }}</h4>
-                        <p class="text-muted mb-2">{{ $service->description }}</p>
-                        <h5 class="text-success">
-                            <i class="fas fa-tag mr-1"></i>
-                            Rp{{ number_format($service->price, 0, ',', '.') }}
-                        </h5>
-                    </div>
-                </div>
-            </div>
+        <!-- Success/Error Messages -->
+        @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="fas fa-check-circle mr-2"></i>
+            {{ session('success') }}
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
         </div>
-
-        <!-- Add to Cart Card -->
-        <div class="card card-success mb-4">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-cart-plus mr-2"></i>
-                    Tambahkan ke Keranjang
-                </h3>
-            </div>
-            <div class="card-body">
-                <p class="text-muted">Klik tombol di bawah untuk menambahkan layanan ini ke keranjang belanja Anda.</p>
-                <form action="{{ route('member.cart.add') }}" method="POST" class="d-inline">
-                    @csrf
-                    <input type="hidden" name="service_id" value="{{ $service->id }}">
-                    <button type="submit" class="btn btn-success btn-block">
-                        <i class="fas fa-cart-plus mr-2"></i>
-                        Tambah ke Keranjang
-                    </button>
-                </form>
-            </div>
+        @endif
+        @if(session('info'))
+        <div class="alert alert-info alert-dismissible fade show">
+            <i class="fas fa-info-circle mr-2"></i>
+            {{ session('info') }}
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
         </div>
+        @endif
+        @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            {{ $errors->first() }}
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
+        </div>
+        @endif
 
-        <!-- Direct Order Form -->
-        <div class="card card-warning">
+        <div class="card card-info">
             <div class="card-header">
                 <h3 class="card-title">
-                    <i class="fas fa-clipboard-list mr-2"></i>
-                    Atau Pesan Langsung
+                    <i class="fas fa-shopping-cart mr-2"></i>
+                    Keranjang Belanja Anda
                 </h3>
             </div>
-            <form action="{{ route('member.orders.store') }}" method="POST" id="orderForm">
+            <form action="{{ route('member.checkout') }}" method="POST" id="checkoutForm">
                 @csrf
-                <input type="hidden" name="service_id" value="{{ $service->id }}">
-                <input type="hidden" name="total_price" value="{{ $service->price }}">
                 <div class="card-body">
+                    @if($services->isEmpty())
+                    <div class="text-center py-4">
+                        <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Keranjang Anda Kosong</h5>
+                        <p class="text-muted">Tambahkan layanan dari halaman <a href="{{ route('member.services.index') }}">Layanan</a>.</p>
+                    </div>
+                    @else
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-hover">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th width="30">
+                                        <input type="checkbox" id="selectAllItems">
+                                    </th>
+                                    <th>Layanan</th>
+                                    <th width="150">Harga</th>
+                                    <th width="100">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($cartItems as $item)
+                                @php
+                                $service = $services->get($item['service_id']);
+                                @endphp
+                                @if($service)
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" name="selected_services[]" class="item-checkbox" value="{{ $service->id }}" checked>
+                                    </td>
+                                    <td>
+                                        <strong>{{ $service->name }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ $service->description }}</small>
+                                    </td>
+                                    <td class="text-right">Rp{{ number_format($service->price, 0, ',', '.') }}</td>
+                                    <td>
+                                        <form action="{{ route('member.cart.remove') }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <input type="hidden" name="service_id" value="{{ $service->id }}">
+                                            <button type="submit" class="btn btn-danger btn-sm" title="Hapus">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                @endif
+                                @endforeach
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="2" class="text-right">Total Harga Terpilih:</th>
+                                    <th class="text-right" id="totalSelectedPrice">Rp{{ number_format($totalCartPrice, 0, ',', '.') }}</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <hr>
+
                     <!-- Delivery Method -->
                     <div class="form-group">
                         <label class="font-weight-bold">
@@ -180,43 +212,7 @@
                             Contoh: kondisi sepatu, permintaan khusus, dll.
                         </small>
                     </div>
-
-                    <!-- Order Summary -->
-                    <div class="card card-outline card-info">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">
-                                <i class="fas fa-receipt mr-2"></i>
-                                Ringkasan Pesanan
-                            </h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-6">
-                                    <strong>Layanan:</strong>
-                                </div>
-                                <div class="col-6 text-right">
-                                    {{ $service->name }}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-6">
-                                    <strong>Harga:</strong>
-                                </div>
-                                <div class="col-6 text-right">
-                                    Rp{{ number_format($service->price, 0, ',', '.') }}
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                                <div class="col-6">
-                                    <strong class="text-success">Total:</strong>
-                                </div>
-                                <div class="col-6 text-right">
-                                    <strong class="text-success">Rp{{ number_format($service->price, 0, ',', '.') }}</strong>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    @endif
                 </div>
                 <!-- Card Footer -->
                 <div class="card-footer">
@@ -224,13 +220,13 @@
                         <div class="col-md-6">
                             <a href="{{ route('member.services.index') }}" class="btn btn-secondary btn-block">
                                 <i class="fas fa-arrow-left mr-2"></i>
-                                Kembali ke Layanan
+                                Lanjutkan Belanja
                             </a>
                         </div>
                         <div class="col-md-6">
-                            <button type="submit" class="btn btn-warning btn-block" id="submitBtn">
-                                <i class="fas fa-paper-plane mr-2"></i>
-                                Pesan Sekarang
+                            <button type="submit" class="btn btn-primary btn-block" id="checkoutBtn" {{ $services->isEmpty() ? 'disabled' : '' }}>
+                                <i class="fas fa-cash-register mr-2"></i>
+                                Checkout
                             </button>
                         </div>
                     </div>
@@ -244,6 +240,49 @@
 @section('js')
 <script>
     $(document).ready(function() {
+        // Service prices from backend
+        const servicePrices = @json($servicePrices);
+
+        // Function to update total selected price
+        function updateSelectedPrice() {
+            let total = 0;
+            $('.item-checkbox:checked').each(function() {
+                const serviceId = parseInt($(this).val());
+                if (servicePrices[serviceId]) {
+                    total += parseInt(servicePrices[serviceId]); // Pastikan konversi ke integer
+                }
+            });
+
+            // Format angka dengan pemisah ribuan
+            const formattedTotal = new Intl.NumberFormat('id-ID').format(total);
+            $('#totalSelectedPrice').text('Rp' + formattedTotal);
+
+            // Enable/disable checkout button based on selected items
+            if ($('.item-checkbox:checked').length > 0) {
+                $('#checkoutBtn').prop('disabled', false);
+            } else {
+                $('#checkoutBtn').prop('disabled', true);
+            }
+        }
+
+        // Initial calculation on page load
+        updateSelectedPrice();
+
+        // Select all checkbox
+        $('#selectAllItems').on('change', function() {
+            $('.item-checkbox').prop('checked', $(this).prop('checked'));
+            updateSelectedPrice();
+        });
+
+        // Individual checkbox change
+        $('.item-checkbox').on('change', function() {
+            updateSelectedPrice();
+            // Update select all checkbox state
+            const totalCheckboxes = $('.item-checkbox').length;
+            const checkedCheckboxes = $('.item-checkbox:checked').length;
+            $('#selectAllItems').prop('checked', totalCheckboxes === checkedCheckboxes);
+        });
+
         // Toggle pickup fields based on delivery method
         $('input[name="delivery_method"]').on('change', function() {
             if ($(this).val() === 'antar_jemput') {
@@ -257,12 +296,19 @@
             }
         });
 
-        // Initialize on page load
+        // Initialize on page load for delivery method fields
         $('input[name="delivery_method"]:checked').trigger('change');
 
-        // Form submission
-        $('#orderForm').on('submit', function(e) {
-            $('#submitBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...');
+        // Checkout form submission
+        $('#checkoutForm').on('submit', function(e) {
+            const selectedItemsCount = $('.item-checkbox:checked').length;
+            if (selectedItemsCount === 0) {
+                Swal.fire('Error', 'Pilih setidaknya satu layanan untuk checkout.', 'error');
+                e.preventDefault(); // Prevent form submission
+                return;
+            }
+
+            $('#checkoutBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i>Memproses Checkout...');
         });
     });
 </script>

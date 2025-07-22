@@ -12,6 +12,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -102,6 +103,14 @@ Route::middleware(['member', 'verified'])->group(function () {
         Route::get('/unfinish', [PaymentController::class, 'unfinish'])->name('unfinish');
         Route::get('/error', [PaymentController::class, 'error'])->name('error');
     });
+
+    // Rute Keranjang
+    Route::post('/cart/add', [CartController::class, 'add'])->name('member.cart.add');
+    Route::get('/cart', [CartController::class, 'index'])->name('member.cart.index');
+    Route::post('/cart/remove', [CartController::class, 'remove'])->name('member.cart.remove');
+
+    // Rute Checkout
+    Route::post('/checkout', [CartController::class, 'checkout'])->name('member.checkout');
 });
 
 // Midtrans Webhook (no auth required)
