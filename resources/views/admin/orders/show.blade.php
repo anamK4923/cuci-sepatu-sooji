@@ -5,7 +5,6 @@
 @section('content_header_subtitle', 'Detail Pesanan #' . $order->id)
 
 @section('content_body')
-
 <div class="row">
     <div class="col-md-8">
         <!-- Order Details Card -->
@@ -19,7 +18,6 @@
                     <span class="badge badge-{{ getStatusBadgeClass($order->status) }} badge-lg">
                         @php
                         $customStatusLabel = $order->status_label;
-
                         if ($order->delivery_method === 'drop_off') {
                         if ($order->status === 'waiting_pickup') {
                         $customStatusLabel = 'Menunggu Pengantaran';
@@ -32,13 +30,10 @@
                         }
                         }
                         @endphp
-
                         {{ $customStatusLabel }}
                     </span>
                 </div>
-
             </div>
-
             <div class="card-body">
                 <div class="row">
                     <!-- Customer Information -->
@@ -62,7 +57,6 @@
                             </tr>
                         </table>
                     </div>
-
                     <!-- Service Information -->
                     <div class="col-md-6">
                         <h5 class="text-success">
@@ -85,9 +79,7 @@
                         </table>
                     </div>
                 </div>
-
                 <hr>
-
                 <!-- Delivery Information -->
                 <div class="row">
                     <div class="col-md-12">
@@ -131,9 +123,7 @@
                         </table>
                     </div>
                 </div>
-
                 <hr>
-
                 <!-- Payment Information -->
                 <div class="row">
                     <div class="col-md-12">
@@ -169,7 +159,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Service Image Card -->
         @if(optional($order->service)->image)
         <div class="card card-info">
@@ -187,7 +176,6 @@
             </div>
         </div>
         @endif
-
     </div>
 
     <div class="col-md-4">
@@ -203,55 +191,64 @@
                 <!-- Update Status -->
                 <div class="form-group">
                     <label>Update Status Pesanan</label>
-
                     @php
-                    $statuses = [
+                    $allStatuses = [
                     'waiting_pickup' => 'Menunggu Penjemputan',
                     'picked_up' => 'Sudah Dijemput',
                     'in_process' => 'Sedang Diproses',
-                    'ready' => 'Siap Diantar',
+                    'ready' => 'Siap Diambil',
                     'done' => 'Selesai',
                     'cancelled' => 'Dibatalkan',
                     ];
+
+                    $statusKeysOrdered = array_keys($allStatuses);
+                    $currentStatusKey = $order->status;
+                    $allowedStatusKeys = [];
+
+                    // Temukan indeks status saat ini
+                    $currentStatusIndex = array_search($currentStatusKey, $statusKeysOrdered);
+
+                    // Selalu sertakan status saat ini dalam dropdown
+                    if ($currentStatusIndex !== false) {
+                    $allowedStatusKeys[] = $currentStatusKey;
+                    }
+
+                    // Sertakan status berikutnya jika ada (termasuk 'done' jika itu adalah langkah selanjutnya)
+                    if ($currentStatusIndex !== false && isset($statusKeysOrdered[$currentStatusIndex + 1])) {
+                    $nextStatusKey = $statusKeysOrdered[$currentStatusIndex + 1];
+                    // Selalu sertakan status berikutnya, tidak ada pengecualian untuk 'done' di sini
+                    $allowedStatusKeys[] = $nextStatusKey;
+                    }
+                    // Jika status saat ini adalah 'cancelled', hanya tampilkan 'cancelled'
+                    if ($currentStatusKey === 'cancelled') {
+                    $allowedStatusKeys = ['cancelled'];
+                    }
                     @endphp
-
-                    <select class="form-control" id="statusSelect" {{ $order->status === 'done' ? 'disabled' : '' }}>
+                    <select class="form-control" id="statusSelect" {{ $order->status === 'done' || $order->status === 'cancelled' ? 'disabled' : '' }}>
                         <option value="">Pilih Status Baru</option>
-
-                        @if($order->status === 'waiting_pickup')
-                        @if($order->status !== 'picked_up')
-                        <option value="picked_up">
-                            {{ $order->delivery_method === 'drop_off' ? 'Sudah Diantar' : $statuses['picked_up'] }}
-                        </option>
-                        @endif
-                        @else
-                        @foreach($statuses as $key => $label)
-                        @if($key !== $order->status)
+                        @foreach($allowedStatusKeys as $statusKey)
                         @php
-                        // Custom label override
-                        $customLabel = $label;
-
+                        $label = $allStatuses[$statusKey];
+                        // Custom label override based on delivery method
                         if ($order->delivery_method === 'drop_off') {
-                        if ($key === 'waiting_pickup') $customLabel = 'Menunggu Pengantaran';
-                        elseif ($key === 'picked_up') $customLabel = 'Sudah Diantar';
-                        elseif ($key === 'ready') $customLabel = 'Siap Diambil';
+                        if ($statusKey === 'waiting_pickup') $label = 'Menunggu Pengantaran';
+                        elseif ($statusKey === 'picked_up') $label = 'Sudah Diantar';
+                        elseif ($statusKey === 'ready') $label = 'Siap Diambil';
+                        } else { // For 'antar_jemput'
+                        if ($statusKey === 'ready') $label = 'Siap Diantar';
                         }
                         @endphp
-
-                        <option value="{{ $key }}">{{ $customLabel }}</option>
-                        @endif
+                        <option value="{{ $statusKey }}" {{ $statusKey == $order->status ? 'selected' : '' }}>
+                            {{ $label }}
+                        </option>
                         @endforeach
-                        @endif
                     </select>
-
-                    <button class="btn btn-primary btn-sm mt-2" onclick="updateStatus()" {{ $order->status === 'done' ? 'disabled' : '' }}>
+                    <button class="btn btn-primary btn-sm mt-2" onclick="updateStatus('{{ $order->payment_status }}')" {{ $order->status === 'done' || $order->status === 'cancelled' ? 'disabled' : '' }}>
                         <i class="fas fa-sync mr-1"></i>
                         Update Status
                     </button>
                 </div>
-
                 <hr>
-
                 <!-- Update Payment Status -->
                 <div class="form-group">
                     <label>Status Pembayaran</label>
@@ -272,9 +269,7 @@
                         Update Pembayaran
                     </button>
                 </div>
-
                 <hr>
-
                 <!-- Other Actions -->
                 <div class="d-grid gap-2">
                     <button class="btn btn-info btn-block" onclick="printOrder()">
@@ -292,7 +287,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Order Timeline Card -->
         <div class="card card-success">
             <div class="card-header">
@@ -310,17 +304,16 @@
                     'in_process' => ['icon' => 'cogs', 'color' => 'primary', 'title' => 'Sedang Diproses'],
                     'ready' => ['icon' => 'check', 'color' => 'success', 'title' => 'Siap Diambil'],
                     'done' => ['icon' => 'check-circle', 'color' => 'success', 'title' => 'Selesai'],
+                    'cancelled' => ['icon' => 'times-circle', 'color' => 'danger', 'title' => 'Dibatalkan'], // Tambahkan status 'cancelled'
                     ];
                     $currentStepIndex = array_search($order->status, array_keys($timelineSteps));
                     @endphp
-
                     @foreach($timelineSteps as $stepKey => $step)
                     @php
                     $stepIndex = array_search($stepKey, array_keys($timelineSteps));
                     $isCompleted = $stepIndex <= $currentStepIndex;
                         $isCurrent=$stepKey==$order->status;
                         @endphp
-
                         <div class="time-label">
                             <span class="bg-{{ $isCompleted ? $step['color'] : 'secondary' }}">
                                 <i class="fas fa-{{ $step['icon'] }}"></i>
@@ -377,21 +370,17 @@
                 <p><strong>Status:</strong> {{ $order->status_label }}</p>
             </div>
         </div>
-
         <hr>
-
         <!-- Customer Information -->
         <div class="customer-info">
             <h3>Informasi Pelanggan</h3>
             <p><strong>Nama:</strong> {{ $order->user->name }}</p>
             <p><strong>Email:</strong> {{ $order->user->email }}</p>
-            @if($order->user->no_hp)
-            <p><strong>Telepon:</strong> {{ $order->user->no_hp }}</p>
+            @if($order->user->phone) {{-- Menggunakan $order->user->phone sesuai dengan kode Anda --}}
+            <p><strong>Telepon:</strong> {{ $order->user->phone }}</p>
             @endif
         </div>
-
         <hr>
-
         <!-- Service Details -->
         <div class="service-details">
             <h3>Detail Layanan</h3>
@@ -412,10 +401,8 @@
                 </tbody>
             </table>
         </div>
-
         @if($order->alamat_pickup || $order->pickup_schedule || $order->notes)
         <hr>
-
         <!-- Additional Information -->
         <div class="additional-info">
             <h3>Informasi Tambahan</h3>
@@ -430,9 +417,7 @@
             @endif
         </div>
         @endif
-
         <hr>
-
         <!-- Payment Information -->
         <div class="payment-info">
             <div class="payment-summary">
@@ -454,9 +439,7 @@
                 </table>
             </div>
         </div>
-
         <hr>
-
         <!-- Footer -->
         <div class="invoice-footer">
             <p><em>Terima kasih atas kepercayaan Anda menggunakan layanan Cuci Sepatu Soooji.ID!</em></p>
@@ -464,16 +447,21 @@
         </div>
     </div>
 </div>
-
 @stop
 
 @section('js')
 <script>
-    function updateStatus() {
+    function updateStatus(currentPaymentStatus) { // Tambahkan currentPaymentStatus sebagai parameter
         var newStatus = $('#statusSelect').val();
         if (!newStatus) {
             Swal.fire('Error', 'Pilih status yang akan diupdate', 'error');
             return;
+        }
+
+        // Tambahkan validasi baru di sini
+        if (newStatus === 'done' && currentPaymentStatus === 'pending') {
+            Swal.fire('Error', 'Tidak dapat mengubah status menjadi "Selesai" jika pembayaran masih "Menunggu Dibayar".', 'error');
+            return; // Hentikan eksekusi jika validasi gagal
         }
 
         Swal.fire({
@@ -509,23 +497,33 @@
 
     function updatePaymentStatus() {
         var paymentStatus = $('input[name="payment_status"]:checked').val();
-
-        $.ajax({
-            url: '{{ route("admin.orders.update-payment-status", $order) }}',
-            method: 'PATCH',
-            data: {
-                payment_status: paymentStatus,
-                _token: '{{ csrf_token() }}'
-            },
-            success: function(response) {
-                if (response.success) {
-                    Swal.fire('Berhasil', response.message, 'success').then(() => {
-                        location.reload();
-                    });
-                }
-            },
-            error: function() {
-                Swal.fire('Error', 'Gagal mengubah status pembayaran', 'error');
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: 'Yakin ingin mengubah status pembayaran pesanan ini?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Ubah',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '{{ route("admin.orders.update-payment-status", $order) }}',
+                    method: 'PATCH',
+                    data: {
+                        payment_status: paymentStatus,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire('Berhasil', response.message, 'success').then(() => {
+                                location.reload();
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'Gagal mengubah status pembayaran', 'error');
+                    }
+                });
             }
         });
     }
@@ -662,9 +660,7 @@
             </body>
             </html>
         `);
-
         printWindow.document.close();
-
         // Wait for content to load then print
         printWindow.onload = function() {
             printWindow.print();

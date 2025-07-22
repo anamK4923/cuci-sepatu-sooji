@@ -5,7 +5,6 @@
 @section('content_header_subtitle', 'Kelola Semua Pesanan Customer')
 
 @section('content_body')
-
 <!-- Statistics Cards -->
 <div class="row mb-4">
     <div class="col-lg-3 col-6">
@@ -42,7 +41,6 @@
     </button>
 </div>
 @endif
-
 @if($errors->any())
 <div class="alert alert-danger alert-dismissible fade show">
     <i class="fas fa-exclamation-triangle mr-2"></i>
@@ -66,7 +64,6 @@
             </button>
         </div>
     </div>
-
     <div class="card-body">
         <!-- Filters -->
         <form method="GET" class="mb-4">
@@ -226,7 +223,8 @@
                                 <button
                                     class="btn btn-sm btn-{{ getStatusBadgeClass($order->status) }} {{ $order->status_label !== 'Selesai' ? 'dropdown-toggle' : '' }}"
                                     type="button"
-                                    @if ($order->status_label !== 'Selesai') data-toggle="dropdown" @endif >
+                                    @if ($order->status_label !== 'Selesai') data-toggle="dropdown" @endif
+                                    >
                                     {{
                                         $order->delivery_method_label === "Drop Off" && $order->status_label === "Menunggu Penjemputan"
                                             ? "Menunggu Pengantaran"
@@ -234,8 +232,8 @@
                                                 $order->delivery_method_label === "Drop Off" && $order->status_label === "Sudah Dijemput"
                                                     ? "Sudah Diantar"
                                                     : (
-                                                        $order->delivery_method_label === "Drop Off" && $order->status_label === "Siap Diambil"
-                                                            ? $order->status_label
+                                                        $order->delivery_method_label === "Antar Jemput" && $order->status_label === "Siap Diambil"
+                                                            ? "Siap Diantar"
                                                             : (
                                                                 $order->status_label === "Selesai"
                                                                     ? "Selesai"
@@ -245,44 +243,50 @@
                                             )
                                     }}
                                 </button>
+                                @if ($order->status_label !== 'Selesai')
                                 <div class="dropdown-menu">
-                                    @if($order->status_label === "Menunggu Penjemputan")
+                                    @php
+                                    // Dapatkan kunci status dalam urutan yang benar dari array $statuses
+                                    $statusKeysOrdered = array_keys($statuses);
+                                    $currentStatusKey = $order->status;
+                                    $allowedStatusKeys = [];
+
+                                    // Temukan indeks status saat ini
+                                    $currentStatusIndex = array_search($currentStatusKey, $statusKeysOrdered);
+
+                                    // Selalu sertakan status saat ini dalam dropdown
+                                    if ($currentStatusIndex !== false) {
+                                    $allowedStatusKeys[] = $currentStatusKey;
+                                    }
+
+                                    // Sertakan status berikutnya jika ada dan bukan status 'Selesai' (completed)
+                                    if ($currentStatusIndex !== false && isset($statusKeysOrdered[$currentStatusIndex + 1])) {
+                                    $nextStatusKey = $statusKeysOrdered[$currentStatusIndex + 1];
+                                    // Asumsi 'completed' adalah kunci untuk status 'Selesai'
+                                    if ($nextStatusKey !== 'completed') { // Pastikan 'completed' adalah kunci yang benar untuk status 'Selesai'
+                                    $allowedStatusKeys[] = $nextStatusKey;
+                                    }
+                                    }
+                                    @endphp
+
                                     @foreach($statuses as $statusKey => $statusLabel)
-                                    @if($statusKey === "picked_up")
+                                    @if (in_array($statusKey, $allowedStatusKeys))
                                     <a class="dropdown-item" href="#"
                                         onclick="updateStatus('{{ $order->id }}', '{{ $statusKey }}')">
-                                        {{ $order->delivery_method_label === "Drop Off" ? "Sudah Diantar" : $statusLabel }}
-                                    </a>
-                                    @endif
-                                    @endforeach
-                                    @else
-                                    @foreach($statuses as $statusKey => $statusLabel)
-                                    @if($statusKey != $order->status)
-                                    @if($statusKey === "waiting_pickup")
-                                    <a class="dropdown-item" href="#"
-                                        onclick="updateStatus('{{ $order->id }}', '{{ $statusKey }}')">
+                                        @if($statusKey === "waiting_pickup")
                                         {{ $order->delivery_method_label === "Drop Off" ? "Menunggu Pengantaran" : $statusLabel }}
-                                    </a>
-                                    @elseif($statusKey === "picked_up")
-                                    <a class="dropdown-item" href="#"
-                                        onclick="updateStatus('{{ $order->id }}', '{{ $statusKey }}')">
+                                        @elseif($statusKey === "picked_up")
                                         {{ $order->delivery_method_label === "Drop Off" ? "Sudah Diantar" : $statusLabel }}
-                                    </a>
-                                    @elseif($statusKey === "ready")
-                                    <a class="dropdown-item" href="#"
-                                        onclick="updateStatus('{{ $order->id }}', '{{ $statusKey }}')">
+                                        @elseif($statusKey === "ready")
                                         {{ $order->delivery_method_label === "Drop Off" ? $statusLabel : "Siap Diantar" }}
-                                    </a>
-                                    @else
-                                    <a class="dropdown-item" href="#"
-                                        onclick="updateStatus('{{ $order->id }}', '{{ $statusKey }}')">
+                                        @else
                                         {{ $statusLabel }}
+                                        @endif
                                     </a>
-                                    @endif
                                     @endif
                                     @endforeach
-                                    @endif
                                 </div>
+                                @endif
                             </div>
                         </td>
                         <td>
@@ -355,13 +359,11 @@
         </div>
     </div>
 </div>
-
 @stop
 
 @section('js')
 <!-- jsPDF CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <script>
     $(document).ready(function() {
         // Initialize tooltips
@@ -376,7 +378,6 @@
         // Individual checkbox
         $('.order-checkbox').on('change', function() {
             toggleBulkActions();
-
             // Update select all checkbox
             var totalCheckboxes = $('.order-checkbox').length;
             var checkedCheckboxes = $('.order-checkbox:checked').length;
@@ -386,16 +387,13 @@
         // Bulk form submission
         $('#bulkForm').on('submit', function(e) {
             e.preventDefault();
-
             var selectedIds = $('.order-checkbox:checked').map(function() {
                 return $(this).val();
             }).get();
-
             if (selectedIds.length === 0) {
                 Swal.fire('Error', 'Pilih minimal satu pesanan', 'error');
                 return;
             }
-
             // Add selected IDs to form
             selectedIds.forEach(function(id) {
                 $('<input>').attr({
@@ -404,7 +402,6 @@
                     value: id
                 }).appendTo('#bulkForm');
             });
-
             // Add additional fields based on action
             var action = $('select[name="action"]').val();
             if (action === 'update_status') {
@@ -419,7 +416,6 @@
                     value: status
                 }).appendTo('#bulkForm');
             }
-
             // Confirm and submit
             Swal.fire({
                 title: 'Konfirmasi',
@@ -439,7 +435,6 @@
         $('select[name="action"]').on('change', function() {
             var action = $(this).val();
             var optionsHtml = '';
-
             if (action === 'update_status') {
                 optionsHtml = `
                 <select name="bulk_status" id="bulkStatus" class="form-control form-control-sm" required>
@@ -448,7 +443,7 @@
                         <option value="{{ $key }}">{{ $label }}</option>
                     @endforeach
                 </select>
-            `;
+                `;
             } else if (action === 'update_payment_status') {
                 optionsHtml = `
                 <select name="bulk_payment_status" class="form-control form-control-sm" required>
@@ -456,9 +451,8 @@
                     <option value="pending">Pending</option>
                     <option value="paid">Paid</option>
                 </select>
-            `;
+                `;
             }
-
             $('#bulkOptions').html(optionsHtml).toggle(optionsHtml !== '');
         });
     });
@@ -494,12 +488,10 @@
                     },
                     error: function(xhr) {
                         let errorMessage = 'Gagal mengubah status';
-
                         // Check if there's a specific error message from server
                         if (xhr.responseJSON && xhr.responseJSON.message) {
                             errorMessage = xhr.responseJSON.message;
                         }
-
                         Swal.fire('Error', errorMessage, 'error');
                     }
                 });
@@ -508,22 +500,33 @@
     }
 
     function updatePaymentStatus(orderId, paymentStatus) {
-        $.ajax({
-            url: `/orders-admin/${orderId}/update-payment-status`,
-            method: 'PATCH',
-            data: {
-                payment_status: paymentStatus,
-                _token: '{{ csrf_token() }}'
-            },
-            success: function(response) {
-                if (response.success) {
-                    Swal.fire('Berhasil', response.message, 'success').then(() => {
-                        location.reload();
-                    });
-                }
-            },
-            error: function() {
-                Swal.fire('Error', 'Gagal mengubah status pembayaran', 'error');
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: 'Yakin ingin mengubah status pembayaran pesanan ini?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Ubah',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `/orders-admin/${orderId}/update-payment-status`,
+                    method: 'PATCH',
+                    data: {
+                        payment_status: paymentStatus,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire('Berhasil', response.message, 'success').then(() => {
+                                location.reload();
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'Gagal mengubah status pembayaran', 'error');
+                    }
+                });
             }
         });
     }
@@ -617,12 +620,10 @@
             pdf.text('LAPORAN DATA PESANAN', pdf.internal.pageSize.getWidth() / 2, 20, {
                 align: 'center'
             });
-
             pdf.setFontSize(16);
             pdf.text('CUCI SEPATU SOOOJI.ID', pdf.internal.pageSize.getWidth() / 2, 30, {
                 align: 'center'
             });
-
             pdf.setFontSize(12);
             pdf.text(`Tanggal Export: ${exportData.summary.export_date}`, pdf.internal.pageSize.getWidth() / 2, 40, {
                 align: 'center'
@@ -630,12 +631,10 @@
 
             // Filter info if any
             let yPosition = 50;
-
             if (exportData.filters.has_filters) {
                 pdf.setFontSize(10);
                 pdf.text('Filter yang Diterapkan:', 20, yPosition);
                 yPosition += 7;
-
                 if (exportData.filters.status) {
                     pdf.text(`• Status: ${exportData.filters.status_label}`, 25, yPosition);
                     yPosition += 5;
@@ -669,7 +668,6 @@
             const headers = ['ID', 'Customer', 'Email', 'Layanan', 'Metode', 'Total', 'Status', 'Pembayaran', 'Tanggal'];
             const colWidths = [10, 35, 45, 35, 25, 25, 20, 30, 30];
             let xPosition = 20;
-
             pdf.setFontSize(9);
             pdf.setTextColor(255, 255, 255);
             pdf.setFillColor(60, 60, 60);
@@ -684,7 +682,6 @@
                 });
                 xPosition += colWidths[index];
             });
-
             yPosition += 10;
             pdf.setTextColor(40, 40, 40);
 
@@ -694,15 +691,12 @@
                     pdf.addPage();
                     yPosition = 20;
                 }
-
                 xPosition = 20;
-
                 // Alternate row colors
                 if (index % 2 === 0) {
                     pdf.setFillColor(248, 249, 250);
                     pdf.rect(20, yPosition - 5, 255, 10, 'F');
                 }
-
                 const rowData = [
                     `#${order.id}`,
                     order.user.name.substring(0, 20) + (order.user.name.length > 20 ? '...' : ''),
@@ -714,14 +708,12 @@
                     order.payment_status_label,
                     order.created_at_formatted
                 ];
-
                 rowData.forEach((data, colIndex) => {
                     pdf.text(data, xPosition + 2, yPosition, {
                         maxWidth: colWidths[colIndex] - 4
                     });
                     xPosition += colWidths[colIndex];
                 });
-
                 yPosition += 10;
             });
 
@@ -737,10 +729,8 @@
 
             // Save the PDF
             pdf.save(fileName);
-
             Swal.close();
             Swal.fire('Berhasil', 'PDF berhasil diunduh', 'success');
-
         } catch (error) {
             console.error('PDF generation error:', error);
             Swal.close();
@@ -804,7 +794,7 @@ $classes = [
 'picked_up' => 'info',
 'in_process' => 'primary',
 'ready' => 'success',
-'done' => 'success',
+'completed' => 'success', // Menggunakan 'completed' sebagai kunci untuk 'Selesai'
 'cancelled' => 'danger',
 ];
 return $classes[$status] ?? 'secondary';
