@@ -314,6 +314,7 @@ return [
             'icon'         => 'fas fa-shopping-cart',
             'url'          => '/cart',
             'topnav_right' => true,
+            'can' => 'member-only',
         ],
 
         // Sidebar items:
