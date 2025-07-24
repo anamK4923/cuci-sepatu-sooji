@@ -14,29 +14,56 @@ use Carbon\Carbon;
 class CartController extends Controller
 {
     /**
-     * Add a service to the cart (session).
+     * Add a service with full order details to the cart (session).
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function add(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'service_id' => 'required|exists:services,id',
+            'delivery_method' => ['required', Rule::in([Order::DELIVERY_ANTAR_JEMPUT, Order::DELIVERY_DROP_OFF])],
+            'alamat_pickup' => 'required_if:delivery_method,' . Order::DELIVERY_ANTAR_JEMPUT . '|nullable|string|max:1000',
+            'pickup_schedule' => [
+                'required_if:delivery_method,' . Order::DELIVERY_ANTAR_JEMPUT,
+                'nullable',
+                Rule::in(['12:00', '18:00'])
+            ],
+            'notes' => 'nullable|string|max:1000',
+            'total_price' => 'required|numeric|min:0', // Ensure total_price is passed from create.blade.php
+        ], [
+            'service_id.required' => 'Layanan harus dipilih.',
+            'service_id.exists' => 'Layanan yang dipilih tidak valid.',
+            'delivery_method.required' => 'Metode pengiriman harus dipilih.',
+            'delivery_method.in' => 'Metode pengiriman tidak valid.',
+            'alamat_pickup.required_if' => 'Alamat penjemputan wajib diisi untuk metode antar jemput.',
+            'alamat_pickup.max' => 'Alamat penjemputan maksimal 1000 karakter.',
+            'pickup_schedule.required_if' => 'Jadwal penjemputan wajib diisi untuk metode antar jemput.',
+            'pickup_schedule.in' => 'Jadwal penjemputan tidak valid. Pilih salah satu dari jadwal yang tersedia.',
+            'notes.max' => 'Catatan maksimal 1000 karakter.',
+            'total_price.required' => 'Total harga harus ada.',
+            'total_price.numeric' => 'Total harga harus berupa angka.',
+            'total_price.min' => 'Total harga tidak boleh negatif.',
         ]);
 
-        $serviceId = $request->input('service_id');
         $cart = $request->session()->get('cart', []);
 
-        // Check if service already in cart to prevent duplicates for simplicity
-        // For more complex carts, you might increment quantity
-        if (!in_array($serviceId, array_column($cart, 'service_id'))) {
-            $cart[] = ['service_id' => $serviceId];
-            $request->session()->put('cart', $cart);
-            return redirect()->route('member.cart.index')->with('success', 'Layanan berhasil ditambahkan ke keranjang!');
-        }
+        // Add a unique identifier for each cart item
+        $cartItem = [
+            'unique_id' => uniqid(), // Generate a unique ID for this specific cart entry
+            'service_id' => $validated['service_id'],
+            'delivery_method' => $validated['delivery_method'],
+            'alamat_pickup' => $validated['alamat_pickup'] ?? null,
+            'pickup_schedule' => $validated['pickup_schedule'] ?? null, // Store as string, convert to Carbon at checkout
+            'notes' => $validated['notes'] ?? null,
+            'total_price' => $validated['total_price'],
+        ];
 
-        return redirect()->route('member.cart.index')->with('info', 'Layanan sudah ada di keranjang.');
+        $cart[] = $cartItem;
+        $request->session()->put('cart', $cart);
+
+        return redirect()->route('member.cart.index')->with('success', 'Layanan berhasil ditambahkan ke keranjang!');
     }
 
     /**
@@ -50,17 +77,19 @@ class CartController extends Controller
         $cartItems = $request->session()->get('cart', []);
         $services = collect();
         $totalCartPrice = 0;
-        $servicePrices = []; // Tambahkan ini
+        $servicePrices = []; // This will now store total_price from cart items
 
         if (!empty($cartItems)) {
+            // Get all service IDs from cart items to fetch services efficiently
             $serviceIds = array_column($cartItems, 'service_id');
             $services = Service::whereIn('id', $serviceIds)->get()->keyBy('id');
 
             foreach ($cartItems as $item) {
                 if ($services->has($item['service_id'])) {
-                    $service = $services[$item['service_id']];
-                    $totalCartPrice += $service->price;
-                    $servicePrices[$service->id] = $service->price; // Tambahkan ini
+                    // Sum the total_price stored in each cart item
+                    $totalCartPrice += $item['total_price'];
+                    // Store the total_price for JS calculation if needed, keyed by unique_id
+                    $servicePrices[$item['unique_id']] = $item['total_price'];
                 }
             }
         }
@@ -69,7 +98,7 @@ class CartController extends Controller
     }
 
     /**
-     * Remove an item from the cart.
+     * Remove an item from the cart by its unique ID.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -77,14 +106,14 @@ class CartController extends Controller
     public function remove(Request $request)
     {
         $request->validate([
-            'service_id' => 'required|exists:services,id',
+            'unique_id' => 'required|string', // Now removing by unique_id
         ]);
 
-        $serviceIdToRemove = $request->input('service_id');
+        $uniqueIdToRemove = $request->input('unique_id');
         $cart = $request->session()->get('cart', []);
 
-        $updatedCart = array_filter($cart, function ($item) use ($serviceIdToRemove) {
-            return $item['service_id'] != $serviceIdToRemove;
+        $updatedCart = array_filter($cart, function ($item) use ($uniqueIdToRemove) {
+            return $item['unique_id'] != $uniqueIdToRemove;
         });
 
         $request->session()->put('cart', array_values($updatedCart)); // Re-index array
@@ -100,73 +129,64 @@ class CartController extends Controller
     public function checkout(Request $request)
     {
         $validated = $request->validate([
-            'selected_services' => 'required|array|min:1',
-            'selected_services.*' => 'exists:services,id', // Ensure selected service IDs exist
-            'delivery_method' => ['required', Rule::in([Order::DELIVERY_ANTAR_JEMPUT, Order::DELIVERY_DROP_OFF])],
-            'alamat_pickup' => 'required_if:delivery_method,' . Order::DELIVERY_ANTAR_JEMPUT . '|nullable|string|max:1000',
-            'pickup_schedule' => [
-                'required_if:delivery_method,' . Order::DELIVERY_ANTAR_JEMPUT,
-                'nullable',
-                Rule::in(['12:00', '18:00'])
-            ],
-            'notes' => 'nullable|string|max:1000',
+            'selected_cart_items' => 'required|array|min:1', // Now expecting unique_ids of cart items
+            'selected_cart_items.*' => 'string', // Each element is a unique_id string
         ], [
-            'selected_services.required' => 'Pilih setidaknya satu layanan untuk checkout.',
-            'selected_services.*.exists' => 'Layanan yang dipilih tidak valid.',
-            'delivery_method.required' => 'Metode pengiriman harus dipilih.',
-            'delivery_method.in' => 'Metode pengiriman tidak valid.',
-            'alamat_pickup.required_if' => 'Alamat penjemputan wajib diisi untuk metode antar jemput.',
-            'alamat_pickup.max' => 'Alamat penjemputan maksimal 1000 karakter.',
-            'pickup_schedule.required_if' => 'Jadwal penjemputan wajib diisi untuk metode antar jemput.',
-            'pickup_schedule.in' => 'Jadwal penjemputan tidak valid. Pilih salah satu dari jadwal yang tersedia.',
-            'notes.max' => 'Catatan maksimal 1000 karakter.',
+            'selected_cart_items.required' => 'Pilih setidaknya satu layanan untuk checkout.',
+            'selected_cart_items.*.string' => 'Item keranjang yang dipilih tidak valid.',
         ]);
 
         try {
             DB::beginTransaction();
 
-            $selectedServiceIds = $validated['selected_services'];
-            $servicesToOrder = Service::whereIn('id', $selectedServiceIds)->get();
+            $selectedUniqueIds = $validated['selected_cart_items'];
+            $cart = $request->session()->get('cart', []);
+            $ordersCreatedCount = 0;
 
-            if ($servicesToOrder->isEmpty()) {
-                return back()->withErrors(['error' => 'Tidak ada layanan yang valid untuk dipesan.']);
-            }
+            $newCart = []; // To store items that were NOT checked out
 
-            foreach ($servicesToOrder as $service) {
-                $pickupDateTime = null;
-                if ($validated['delivery_method'] === Order::DELIVERY_ANTAR_JEMPUT && $validated['pickup_schedule']) {
-                    $today = now()->format('Y-m-d');
-                    $pickupDateTime = Carbon::createFromFormat('Y-m-d H:i', $today . ' ' . $validated['pickup_schedule']);
-                    if ($pickupDateTime->lt(now())) {
-                        $pickupDateTime->addDay();
+            foreach ($cart as $cartItem) {
+                if (in_array($cartItem['unique_id'], $selectedUniqueIds)) {
+                    // This item is selected for checkout
+                    $pickupDateTime = null;
+                    if ($cartItem['delivery_method'] === Order::DELIVERY_ANTAR_JEMPUT && $cartItem['pickup_schedule']) {
+                        $today = now()->format('Y-m-d');
+                        $pickupDateTime = Carbon::createFromFormat('Y-m-d H:i', $today . ' ' . $cartItem['pickup_schedule']);
+                        if ($pickupDateTime->lt(now())) {
+                            $pickupDateTime->addDay();
+                        }
                     }
+
+                    Order::create([
+                        'user_id' => Auth::id(),
+                        'service_id' => $cartItem['service_id'],
+                        'delivery_method' => $cartItem['delivery_method'],
+                        'alamat_pickup' => $cartItem['alamat_pickup'],
+                        'pickup_schedule' => $pickupDateTime,
+                        'notes' => $cartItem['notes'],
+                        'total_price' => $cartItem['total_price'],
+                        'status' => Order::STATUS_WAITING_PICKUP,
+                        'payment_status' => Order::PAYMENT_PENDING,
+                        'midtrans_order_id' => $this->generateMidtransOrderId($cartItem['service_id']),
+                    ]);
+                    $ordersCreatedCount++;
+                } else {
+                    // This item was not selected, keep it in the cart
+                    $newCart[] = $cartItem;
                 }
-
-                Order::create([
-                    'user_id' => Auth::id(),
-                    'service_id' => $service->id,
-                    'delivery_method' => $validated['delivery_method'],
-                    'alamat_pickup' => $validated['alamat_pickup'] ?? null,
-                    'pickup_schedule' => $pickupDateTime,
-                    'notes' => $validated['notes'] ?? null,
-                    'total_price' => $service->price, // Use actual service price
-                    'status' => Order::STATUS_WAITING_PICKUP,
-                    'payment_status' => Order::PAYMENT_PENDING,
-                    'midtrans_order_id' => $this->generateMidtransOrderId($service->id), // Implement this method
-                ]);
-
-                // Remove the ordered service from the session cart
-                $cart = $request->session()->get('cart', []);
-                $updatedCart = array_filter($cart, function ($item) use ($service) {
-                    return $item['service_id'] != $service->id;
-                });
-                $request->session()->put('cart', array_values($updatedCart));
             }
+
+            $request->session()->put('cart', array_values($newCart)); // Update session cart
 
             DB::commit();
 
-            return redirect()->route('member.orders.status') // Assuming this is your order status page
-                ->with('success', 'Pesanan berhasil dibuat! Silakan lakukan pembayaran untuk melanjutkan proses.');
+            if ($ordersCreatedCount > 0) {
+                return redirect()->route('member.orders.status')
+                    ->with('success', 'Pesanan berhasil dibuat! Silakan lakukan pembayaran untuk melanjutkan proses.');
+            } else {
+                return back()->withErrors(['error' => 'Tidak ada layanan yang valid untuk dipesan.'])
+                    ->withInput();
+            }
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withErrors(['error' => 'Terjadi kesalahan saat membuat pesanan: ' . $e->getMessage()])

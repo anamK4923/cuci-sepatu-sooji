@@ -36,6 +36,8 @@ class OrderController extends Controller
 
     /**
      * Store a newly created order
+     * NOTE: This method is no longer directly used by the 'create.blade.php' form in the new flow.
+     * The 'create.blade.php' form now adds items to the cart via CartController@add.
      */
     public function store(Request $request)
     {

@@ -40,35 +40,15 @@
             </div>
         </div>
 
-        <!-- Add to Cart Card -->
-        <div class="card card-success mb-4">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-cart-plus mr-2"></i>
-                    Tambahkan ke Keranjang
-                </h3>
-            </div>
-            <div class="card-body">
-                <p class="text-muted">Klik tombol di bawah untuk menambahkan layanan ini ke keranjang belanja Anda.</p>
-                <form action="{{ route('member.cart.add') }}" method="POST" class="d-inline">
-                    @csrf
-                    <input type="hidden" name="service_id" value="{{ $service->id }}">
-                    <button type="submit" class="btn btn-success btn-block">
-                        <i class="fas fa-cart-plus mr-2"></i>
-                        Tambah ke Keranjang
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Direct Order Form -->
+        <!-- Order Details Form -->
         <div class="card card-warning">
             <div class="card-header">
                 <h3 class="card-title">
                     <i class="fas fa-clipboard-list mr-2"></i>
-                    Atau Pesan Langsung
+                    Konfigurasi Pesanan
                 </h3>
             </div>
+            {{-- Form action defaults to direct order store --}}
             <form action="{{ route('member.orders.store') }}" method="POST" id="orderForm">
                 @csrf
                 <input type="hidden" name="service_id" value="{{ $service->id }}">
@@ -221,14 +201,22 @@
                 <!-- Card Footer -->
                 <div class="card-footer">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <a href="{{ route('member.services.index') }}" class="btn btn-secondary btn-block">
                                 <i class="fas fa-arrow-left mr-2"></i>
                                 Kembali ke Layanan
                             </a>
                         </div>
-                        <div class="col-md-6">
-                            <button type="submit" class="btn btn-warning btn-block" id="submitBtn">
+                        <div class="col-md-4">
+                            {{-- Button to add to cart --}}
+                            <button type="submit" class="btn btn-success btn-block" id="addToCartBtn">
+                                <i class="fas fa-cart-plus mr-2"></i>
+                                Tambah ke Keranjang
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            {{-- Button to order directly --}}
+                            <button type="submit" class="btn btn-warning btn-block" id="orderNowBtn">
                                 <i class="fas fa-paper-plane mr-2"></i>
                                 Pesan Sekarang
                             </button>
@@ -260,9 +248,27 @@
         // Initialize on page load
         $('input[name="delivery_method"]:checked').trigger('change');
 
-        // Form submission
-        $('#orderForm').on('submit', function(e) {
-            $('#submitBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...');
+        const orderForm = $('#orderForm');
+        const addToCartBtn = $('#addToCartBtn');
+        const orderNowBtn = $('#orderNowBtn');
+
+        // Store original form action
+        const originalFormAction = orderForm.attr('action');
+
+        // Event listener for "Tambah ke Keranjang" button
+        addToCartBtn.on('click', function(e) {
+            e.preventDefault(); // Prevent default form submission
+            orderForm.attr('action', `{{ route('member.cart.add') }}`); // Change action to cart add
+            orderForm.submit(); // Submit the form
+            $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i>Menambahkan...');
+        });
+
+        // Event listener for "Pesan Sekarang" button
+        orderNowBtn.on('click', function(e) {
+            e.preventDefault(); // Prevent default form submission
+            orderForm.attr('action', originalFormAction); // Ensure action is for direct order
+            orderForm.submit(); // Submit the form
+            $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...');
         });
     });
 </script>

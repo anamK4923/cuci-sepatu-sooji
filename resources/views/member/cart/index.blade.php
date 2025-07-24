@@ -43,10 +43,11 @@
                     Keranjang Belanja Anda
                 </h3>
             </div>
+            {{-- Form action changed to CartController@checkout --}}
             <form action="{{ route('member.checkout') }}" method="POST" id="checkoutForm">
                 @csrf
                 <div class="card-body">
-                    @if($services->isEmpty())
+                    @if(empty($cartItems)) {{-- Check if cartItems is empty --}}
                     <div class="text-center py-4">
                         <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
                         <h5 class="text-muted">Keranjang Anda Kosong</h5>
@@ -60,7 +61,7 @@
                                     <th width="30">
                                         <input type="checkbox" id="selectAllItems">
                                     </th>
-                                    <th>Layanan</th>
+                                    <th>Layanan & Detail Pesanan</th>
                                     <th width="150">Harga</th>
                                     <th width="100">Aksi</th>
                                 </tr>
@@ -73,18 +74,42 @@
                                 @if($service)
                                 <tr>
                                     <td>
-                                        <input type="checkbox" name="selected_services[]" class="item-checkbox" value="{{ $service->id }}" checked>
+                                        {{-- Checkbox value is now the unique_id of the cart item --}}
+                                        <input type="checkbox" name="selected_cart_items[]" class="item-checkbox" value="{{ $item['unique_id'] }}" checked>
                                     </td>
                                     <td>
                                         <strong>{{ $service->name }}</strong>
                                         <br>
                                         <small class="text-muted">{{ $service->description }}</small>
+                                        <div class="mt-2">
+                                            <small>
+                                                <strong>Metode Pengiriman:</strong>
+                                                {{ $item['delivery_method'] == 'antar_jemput' ? 'Antar Jemput' : 'Drop Off' }}
+                                            </small>
+                                            @if($item['delivery_method'] == 'antar_jemput')
+                                            <br>
+                                            <small>
+                                                <strong>Alamat Pickup:</strong> {{ $item['alamat_pickup'] }}
+                                            </small>
+                                            <br>
+                                            <small>
+                                                <strong>Jadwal Pickup:</strong> {{ $item['pickup_schedule'] }} WIB
+                                            </small>
+                                            @endif
+                                            @if($item['notes'])
+                                            <br>
+                                            <small>
+                                                <strong>Catatan:</strong> {{ $item['notes'] }}
+                                            </small>
+                                            @endif
+                                        </div>
                                     </td>
-                                    <td class="text-right">Rp{{ number_format($service->price, 0, ',', '.') }}</td>
+                                    <td class="text-right">Rp{{ number_format($item['total_price'], 0, ',', '.') }}</td>
                                     <td>
+                                        {{-- Form action for remove now uses unique_id --}}
                                         <form action="{{ route('member.cart.remove') }}" method="POST" class="d-inline">
                                             @csrf
-                                            <input type="hidden" name="service_id" value="{{ $service->id }}">
+                                            <input type="hidden" name="unique_id" value="{{ $item['unique_id'] }}">
                                             <button type="submit" class="btn btn-danger btn-sm" title="Hapus">
                                                 <i class="fas fa-trash"></i>
                                             </button>
@@ -106,112 +131,9 @@
 
                     <hr>
 
-                    <!-- Delivery Method -->
-                    <div class="form-group">
-                        <label class="font-weight-bold">
-                            <i class="fas fa-shipping-fast text-primary mr-1"></i>
-                            Metode Pengiriman
-                        </label>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="custom-control custom-radio">
-                                    <input class="custom-control-input"
-                                        type="radio"
-                                        id="antar_jemput"
-                                        name="delivery_method"
-                                        value="antar_jemput"
-                                        {{ old('delivery_method') == 'antar_jemput' ? 'checked' : '' }}>
-                                    <label for="antar_jemput" class="custom-control-label">
-                                        <strong>Antar Jemput</strong>
-                                        <br><small class="text-muted">Kami akan mengambil dan mengantar sepatu Anda</small>
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="custom-control custom-radio">
-                                    <input class="custom-control-input"
-                                        type="radio"
-                                        id="drop_off"
-                                        name="delivery_method"
-                                        value="drop_off"
-                                        {{ old('delivery_method') == 'drop_off' ? 'checked' : '' }}>
-                                    <label for="drop_off" class="custom-control-label">
-                                        <strong>Drop Off</strong>
-                                        <br><small class="text-muted">Anda datang langsung ke toko kami</small>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        @error('delivery_method')
-                        <div class="text-danger mt-1">{{ $message }}</div>
-                        @enderror
-                    </div>
+                    {{-- Removed Delivery Method, Pickup Address, Pickup Schedule, and Notes forms --}}
+                    {{-- These are now handled in create.blade.php --}}
 
-                    <!-- Pickup Address (for antar_jemput) -->
-                    <div class="form-group" id="pickup_address_group" style="display: none;">
-                        <label for="alamat_pickup" class="font-weight-bold">
-                            <i class="fas fa-map-marker-alt text-danger mr-1"></i>
-                            Alamat Penjemputan
-                        </label>
-                        <textarea name="alamat_pickup"
-                            id="alamat_pickup"
-                            class="form-control @error('alamat_pickup') is-invalid @enderror"
-                            rows="3"
-                            placeholder="Masukkan alamat lengkap untuk penjemputan...">{{ old('alamat_pickup') }}</textarea>
-                        @error('alamat_pickup')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                        <small class="form-text text-muted">
-                            <i class="fas fa-info-circle mr-1"></i>
-                            Berikan alamat yang jelas dan mudah ditemukan
-                        </small>
-                    </div>
-
-                    <!-- Pickup Schedule (for antar_jemput) -->
-                    <div class="form-group" id="pickup_schedule_group" style="display: none;">
-                        <label for="pickup_schedule" class="font-weight-bold">
-                            <i class="fas fa-calendar-alt text-warning mr-1"></i>
-                            Jadwal Penjemputan
-                        </label>
-                        <select name="pickup_schedule"
-                            id="pickup_schedule"
-                            class="form-control @error('pickup_schedule') is-invalid @enderror">
-                            <option value="">Pilih Jadwal Penjemputan</option>
-                            <option value="12:00" {{ old('pickup_schedule') == '12:00' ? 'selected' : '' }}>
-                                Jam 12.00 WIB - Siang
-                            </option>
-                            <option value="18:00" {{ old('pickup_schedule') == '18:00' ? 'selected' : '' }}>
-                                Jam 18.00 WIB - Sore
-                            </option>
-                        </select>
-                        @error('pickup_schedule')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                        <small class="form-text text-muted">
-                            <i class="fas fa-clock mr-1"></i>
-                            Jadwal penjemputan untuk hari transaksi
-                        </small>
-                    </div>
-
-                    <!-- Notes -->
-                    <div class="form-group">
-                        <label for="notes" class="font-weight-bold">
-                            <i class="fas fa-sticky-note text-info mr-1"></i>
-                            Catatan Tambahan
-                        </label>
-                        <textarea name="notes"
-                            id="notes"
-                            class="form-control @error('notes') is-invalid @enderror"
-                            rows="3"
-                            placeholder="Catatan khusus untuk pesanan Anda (opsional)...">{{ old('notes') }}</textarea>
-                        @error('notes')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                        <small class="form-text text-muted">
-                            <i class="fas fa-lightbulb mr-1"></i>
-                            Contoh: kondisi sepatu, permintaan khusus, dll.
-                        </small>
-                    </div>
                     @endif
                 </div>
                 <!-- Card Footer -->
@@ -224,7 +146,7 @@
                             </a>
                         </div>
                         <div class="col-md-6">
-                            <button type="submit" class="btn btn-primary btn-block" id="checkoutBtn" {{ $services->isEmpty() ? 'disabled' : '' }}>
+                            <button type="submit" class="btn btn-primary btn-block" id="checkoutBtn" {{ empty($cartItems) ? 'disabled' : '' }}>
                                 <i class="fas fa-cash-register mr-2"></i>
                                 Checkout
                             </button>
@@ -240,16 +162,16 @@
 @section('js')
 <script>
     $(document).ready(function() {
-        // Service prices from backend
+        // Service prices from backend (now keyed by unique_id)
         const servicePrices = @json($servicePrices);
 
         // Function to update total selected price
         function updateSelectedPrice() {
             let total = 0;
             $('.item-checkbox:checked').each(function() {
-                const serviceId = parseInt($(this).val());
-                if (servicePrices[serviceId]) {
-                    total += parseInt(servicePrices[serviceId]); // Pastikan konversi ke integer
+                const uniqueId = $(this).val(); // Get unique_id
+                if (servicePrices[uniqueId]) {
+                    total += parseInt(servicePrices[uniqueId]); // Sum based on unique_id
                 }
             });
 
@@ -283,21 +205,7 @@
             $('#selectAllItems').prop('checked', totalCheckboxes === checkedCheckboxes);
         });
 
-        // Toggle pickup fields based on delivery method
-        $('input[name="delivery_method"]').on('change', function() {
-            if ($(this).val() === 'antar_jemput') {
-                $('#pickup_address_group, #pickup_schedule_group').show();
-                $('#alamat_pickup').attr('required', true);
-                $('#pickup_schedule').attr('required', true);
-            } else {
-                $('#pickup_address_group, #pickup_schedule_group').hide();
-                $('#alamat_pickup').attr('required', false);
-                $('#pickup_schedule').attr('required', false);
-            }
-        });
-
-        // Initialize on page load for delivery method fields
-        $('input[name="delivery_method"]:checked').trigger('change');
+        // Removed toggle pickup fields as they are no longer on this page
 
         // Checkout form submission
         $('#checkoutForm').on('submit', function(e) {
