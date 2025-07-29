@@ -314,7 +314,7 @@
                     position: 'left',
                     title: {
                         display: true,
-                        text: 'Revenue (Rp)'
+                        text: 'Pemasukan (Rp)'
                     }
                 },
                 y1: {
@@ -323,7 +323,7 @@
                     position: 'right',
                     title: {
                         display: true,
-                        text: 'Orders'
+                        text: 'Pemesanan'
                     },
                     grid: {
                         drawOnChartArea: false,

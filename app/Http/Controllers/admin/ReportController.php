@@ -210,14 +210,14 @@ class ReportController extends Controller
                 'labels' => collect($chartData)->pluck('formatted_date')->toArray(),
                 'datasets' => [
                     [
-                        'label' => 'Revenue',
+                        'label' => 'Pemasukan (Rp)',
                         'data' => collect($chartData)->pluck('revenue')->toArray(),
                         'borderColor' => 'rgb(75, 192, 192)',
                         'backgroundColor' => 'rgba(75, 192, 192, 0.1)',
                         'yAxisID' => 'y'
                     ],
                     [
-                        'label' => 'Orders',
+                        'label' => 'Pemesanan',
                         'data' => collect($chartData)->pluck('total_orders')->toArray(),
                         'borderColor' => 'rgb(255, 99, 132)',
                         'backgroundColor' => 'rgba(255, 99, 132, 0.1)',
